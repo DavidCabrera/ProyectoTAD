@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-reverse-engineering PUBLIC "-//Hibernate/Hibernate Reverse Engineering DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-reverse-engineering-3.0.dtd">
+<hibernate-reverse-engineering>
+  <schema-selection match-catalog="wechat"/>
+  <table-filter match-name="usuario_tiene_conversacion"/>
+  <table-filter match-name="mensaje"/>
+  <table-filter match-name="conversacion"/>
+  <table-filter match-name="archivo"/>
+  <table-filter match-name="usuario"/>
+</hibernate-reverse-engineering>

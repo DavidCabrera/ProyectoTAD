@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 06-abr-2016 11:05:57 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="com.mycompany.wechat.modelo.Usuario" table="usuario" catalog="wechat" optimistic-lock="version">
+        <id name="idUsuario" type="java.lang.Integer">
+            <column name="idUsuario" />
+            <generator class="identity" />
+        </id>
+        <property name="correo" type="string">
+            <column name="correo" length="50" not-null="true" unique="true" />
+        </property>
+        <property name="clave" type="string">
+            <column name="clave" length="200" not-null="true" />
+        </property>
+        <property name="usuario" type="string">
+            <column name="usuario" length="50" not-null="true" />
+        </property>
+        <property name="admin" type="string">
+            <column name="admin" length="5" not-null="true" />
+        </property>
+        <set name="usuarioTieneConversacions" table="usuario_tiene_conversacion" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="idUsuario" not-null="true" />
+            </key>
+            <one-to-many class="com.mycompany.wechat.modelo.UsuarioTieneConversacion" />
+        </set>
+        <set name="mensajes" table="mensaje" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="idUsuario" not-null="true" />
+            </key>
+            <one-to-many class="com.mycompany.wechat.modelo.Mensaje" />
+        </set>
+    </class>
+</hibernate-mapping>

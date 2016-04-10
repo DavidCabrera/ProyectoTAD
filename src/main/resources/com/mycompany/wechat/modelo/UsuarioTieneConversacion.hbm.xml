@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 06-abr-2016 11:05:57 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="com.mycompany.wechat.modelo.UsuarioTieneConversacion" table="usuario_tiene_conversacion" catalog="wechat" optimistic-lock="version">
+        <composite-id name="id" class="com.mycompany.wechat.modelo.UsuarioTieneConversacionId">
+            <key-property name="idUsuario" type="int">
+                <column name="idUsuario" />
+            </key-property>
+            <key-property name="idConversacion" type="int">
+                <column name="idConversacion" />
+            </key-property>
+        </composite-id>
+        <many-to-one name="conversacion" class="com.mycompany.wechat.modelo.Conversacion" update="false" insert="false" fetch="select">
+            <column name="idConversacion" not-null="true" />
+        </many-to-one>
+        <many-to-one name="usuario" class="com.mycompany.wechat.modelo.Usuario" update="false" insert="false" fetch="select">
+            <column name="idUsuario" not-null="true" />
+        </many-to-one>
+    </class>
+</hibernate-mapping>

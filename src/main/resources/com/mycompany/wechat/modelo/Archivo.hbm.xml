@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 06-abr-2016 11:05:57 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="com.mycompany.wechat.modelo.Archivo" table="archivo" catalog="wechat" optimistic-lock="version">
+        <id name="idArchivo" type="java.lang.Integer">
+            <column name="idArchivo" />
+            <generator class="identity" />
+        </id>
+        <property name="tipo" type="string">
+            <column name="tipo" length="50" not-null="true" />
+        </property>
+        <property name="ruta" type="string">
+            <column name="ruta" length="100" not-null="true" />
+        </property>
+        <property name="fecha" type="timestamp">
+            <column name="fecha" length="19" not-null="true" />
+        </property>
+        <set name="mensajes" table="mensaje" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="idArchivo" not-null="true" />
+            </key>
+            <one-to-many class="com.mycompany.wechat.modelo.Mensaje" />
+        </set>
+    </class>
+</hibernate-mapping>
