@@ -36,7 +36,7 @@ public class MyUI extends UI {
             @Override
             public void buttonClick(ClickEvent event) {
                 l = dao.getListaUsuarios();
-                layout.addComponent(new Label("Thank you for clicking" + l.get(0)));
+                layout.addComponent(new Label("Usuario: " + l.get(0)));
             }
         });
         layout.addComponent(button);

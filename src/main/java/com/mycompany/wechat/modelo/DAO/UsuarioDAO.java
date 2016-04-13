@@ -10,6 +10,7 @@ import com.mycompany.wechat.modelo.Usuario;
 import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 /**
  *
@@ -21,8 +22,8 @@ public class UsuarioDAO {
     }
 
     public List<Usuario> getListaUsuarios() {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        org.hibernate.Transaction tx = session.beginTransaction();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
         String hql = "From Usuario";
         Query query = session.createQuery(hql);
         List<Usuario> listausuarios = query.list();
@@ -31,21 +32,21 @@ public class UsuarioDAO {
     }
 
     public void addUsuario(Usuario u) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        Session session = HibernateUtil.getSessionFactory().openSession();
         org.hibernate.Transaction tx = session.beginTransaction();
         session.save(u);
         tx.commit();
     }
 
     public void deleteUsuario(Usuario u) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        Session session = HibernateUtil.getSessionFactory().openSession();
         org.hibernate.Transaction tx = session.beginTransaction();
         session.delete(u);
         tx.commit();
     }
 
     public void updateUsuario(Usuario u) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        Session session = HibernateUtil.getSessionFactory().openSession();
         org.hibernate.Transaction tx = session.beginTransaction();
         session.update(u);
         tx.commit();
