@@ -16,6 +16,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.List;
+import org.jboss.logging.Logger;
 
 /**
  *
@@ -23,6 +24,8 @@ import java.util.List;
 @Theme("mytheme")
 @Widgetset("com.mycompany.wechat.MyAppWidgetset")
 public class MyUI extends UI {
+    private static Logger log = Logger.getLogger(MyUI.class);
+    
     UsuarioDAO dao= new  UsuarioDAO();
     List<Usuario> l = new ArrayList<>();
     @Override
@@ -35,6 +38,7 @@ public class MyUI extends UI {
         button.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
+                log.debug("Pulsado el boton.");
                 l = dao.getListaUsuarios();
                 layout.addComponent(new Label("Usuario: " + l.get(0)));
             }
