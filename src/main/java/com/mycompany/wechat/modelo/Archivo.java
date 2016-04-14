@@ -70,8 +70,10 @@ public class Archivo  implements java.io.Serializable {
         this.mensajes = mensajes;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "Archivo{" + "idArchivo=" + idArchivo + ", tipo=" + tipo + ", ruta=" + ruta + ", fecha=" + fecha + ", mensajes=" + mensajes + '}';
+    }
 
 }
 

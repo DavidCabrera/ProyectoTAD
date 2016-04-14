@@ -21,8 +21,7 @@ public class Usuario  implements java.io.Serializable {
 
     public Usuario() {
     }
-
-	
+    
     public Usuario(String correo, String clave, String usuario, String admin) {
         this.correo = correo;
         this.clave = clave;

@@ -22,33 +22,75 @@ public class UsuarioDAO {
     }
 
     public List<Usuario> getListaUsuarios() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        String hql = "From Usuario";
-        Query query = session.createQuery(hql);
-        List<Usuario> listausuarios = query.list();
-        tx.commit();
+        Session session = null;
+        List<Usuario> listausuarios = null;
+
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            String hql = "From Usuario";
+            Query query = session.createQuery(hql);
+            listausuarios = query.list();
+            tx.commit();
+        } catch (Exception e) {
+
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
         return listausuarios;
     }
 
     public void addUsuario(Usuario u) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        org.hibernate.Transaction tx = session.beginTransaction();
-        session.save(u);
-        tx.commit();
+        Session session = null;
+
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            org.hibernate.Transaction tx = session.beginTransaction();
+            session.save(u);
+            tx.commit();
+        } catch (Exception e) {
+
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 
     public void deleteUsuario(Usuario u) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        org.hibernate.Transaction tx = session.beginTransaction();
-        session.delete(u);
-        tx.commit();
+        Session session = null;
+
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            org.hibernate.Transaction tx = session.beginTransaction();
+            session.delete(u);
+            tx.commit();
+        } catch (Exception e) {
+
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 
     public void updateUsuario(Usuario u) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        org.hibernate.Transaction tx = session.beginTransaction();
-        session.update(u);
-        tx.commit();
+        Session session = null;
+
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            org.hibernate.Transaction tx = session.beginTransaction();
+            session.update(u);
+            tx.commit();
+        } catch (Exception e) {
+
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 }
