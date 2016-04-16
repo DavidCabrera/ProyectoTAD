@@ -8,16 +8,33 @@ package com.mycompany.wechat.modelo.DAO;
 import com.mycompany.wechat.modelo.Conversacion;
 import com.mycompany.wechat.modelo.HibernateUtil;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 /**
- *
- * @author Sara
+ * Clase que contiene la implementación del DAO de Conversación
  */
 public class ConversacionDAO {
 
+    /**
+     * Log
+     */
+    private static final Logger log = Logger.getLogger(ConversacionDAO.class);
+
+    /**
+     * Constructor sin parámetros
+     */
+    public ConversacionDAO() {
+
+    }
+
+    /**
+     * Obtiene el listado de todas las conversaciones
+     *
+     * @return Listado de conversaciones
+     */
     public List<Conversacion> getAllConversaciones() {
         Session session = null;
         List<Conversacion> listadoConversaciones = null;
@@ -29,7 +46,7 @@ public class ConversacionDAO {
             listadoConversaciones = query.list();
             tx.commit();
         } catch (Exception e) {
-
+            log.error("Error obtienedo el listado de conversaciones: ", e);
         } finally {
             if (null != session) {
                 session.close();
@@ -38,6 +55,11 @@ public class ConversacionDAO {
         return listadoConversaciones;
     }
 
+    /**
+     * Inserta la conversación pasada por parámetro
+     *
+     * @param conversacion a insertar
+     */
     public void addConversacion(Conversacion conversacion) {
         Session session = null;
         try {
@@ -46,7 +68,7 @@ public class ConversacionDAO {
             session.save(conversacion);
             tx.commit();
         } catch (Exception e) {
-
+            log.error("Error insertando una conversación: ", e);
         } finally {
             if (session != null) {
                 session.close();
@@ -54,6 +76,11 @@ public class ConversacionDAO {
         }
     }
 
+    /**
+     * Elimina la conversación pasada por parámetro
+     *
+     * @param conversacion a eliminar
+     */
     public void deleteConversacion(Conversacion conversacion) {
         Session session = null;
 
@@ -63,7 +90,7 @@ public class ConversacionDAO {
             session.delete(conversacion);
             tx.commit();
         } catch (Exception e) {
-
+            log.error("Error eliminando la conversación: ", e);
         } finally {
             if (session != null) {
                 session.close();
@@ -71,6 +98,11 @@ public class ConversacionDAO {
         }
     }
 
+    /**
+     * Actualiza la conversación pasada por parámetro
+     *
+     * @param conversacion a actualizar
+     */
     public void updateConversacion(Conversacion conversacion) {
         Session session = null;
 
@@ -80,7 +112,7 @@ public class ConversacionDAO {
             session.update(conversacion);
             tx.commit();
         } catch (Exception e) {
-
+            log.error("Error actualizando la conversación: ", e);
         } finally {
             if (session != null) {
                 session.close();

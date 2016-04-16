@@ -16,7 +16,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.List;
-import org.jboss.logging.Logger;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -24,7 +24,7 @@ import org.jboss.logging.Logger;
 @Theme("mytheme")
 @Widgetset("com.mycompany.wechat.MyAppWidgetset")
 public class MyUI extends UI {
-    private static Logger log = Logger.getLogger(MyUI.class);
+    private static final Logger log = Logger.getLogger(MyUI.class);
     
     UsuarioDAO dao= new  UsuarioDAO();
     List<Usuario> l = new ArrayList<>();

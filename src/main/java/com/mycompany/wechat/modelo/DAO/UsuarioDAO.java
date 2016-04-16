@@ -8,19 +8,32 @@ package com.mycompany.wechat.modelo.DAO;
 import com.mycompany.wechat.modelo.HibernateUtil;
 import com.mycompany.wechat.modelo.Usuario;
 import java.util.List;
+import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 /**
- *
- * @author Sara
+ * Clase que implementa el DAO de Usuario
  */
 public class UsuarioDAO {
 
+    /**
+     * Log
+     */
+    private static final Logger log = Logger.getLogger(UsuarioDAO.class);
+
+    /**
+     * Constructor sin parámetros
+     */
     public UsuarioDAO() {
     }
 
+    /**
+     * Obtiene el listado de usuarios
+     *
+     * @return Listado de usuarios
+     */
     public List<Usuario> getListaUsuarios() {
         Session session = null;
         List<Usuario> listausuarios = null;
@@ -33,7 +46,7 @@ public class UsuarioDAO {
             listausuarios = query.list();
             tx.commit();
         } catch (Exception e) {
-
+            log.error("Error obteniendo el listado de usuarios: ", e);
         } finally {
             if (session != null) {
                 session.close();
@@ -43,16 +56,21 @@ public class UsuarioDAO {
         return listausuarios;
     }
 
-    public void addUsuario(Usuario u) {
+    /**
+     * Inserta el usuario pasado por parámetro
+     *
+     * @param usurio a insertar
+     */
+    public void addUsuario(Usuario usurio) {
         Session session = null;
 
         try {
             session = HibernateUtil.getSessionFactory().openSession();
             org.hibernate.Transaction tx = session.beginTransaction();
-            session.save(u);
+            session.save(usurio);
             tx.commit();
         } catch (Exception e) {
-
+            log.error("Error insertando el usuario: ", e);
         } finally {
             if (session != null) {
                 session.close();
@@ -60,16 +78,21 @@ public class UsuarioDAO {
         }
     }
 
-    public void deleteUsuario(Usuario u) {
+    /**
+     * Elimina el usuario pasado por parámetro
+     *
+     * @param usuario a eliminar
+     */
+    public void deleteUsuario(Usuario usuario) {
         Session session = null;
 
         try {
             session = HibernateUtil.getSessionFactory().openSession();
             org.hibernate.Transaction tx = session.beginTransaction();
-            session.delete(u);
+            session.delete(usuario);
             tx.commit();
         } catch (Exception e) {
-
+            log.error("Error eliminando el usuario: ", e);
         } finally {
             if (session != null) {
                 session.close();
@@ -77,16 +100,21 @@ public class UsuarioDAO {
         }
     }
 
-    public void updateUsuario(Usuario u) {
+    /**
+     * Actualiza el usuario pasado por parámetro
+     *
+     * @param usuario a actualizar
+     */
+    public void updateUsuario(Usuario usuario) {
         Session session = null;
 
         try {
             session = HibernateUtil.getSessionFactory().openSession();
             org.hibernate.Transaction tx = session.beginTransaction();
-            session.update(u);
+            session.update(usuario);
             tx.commit();
         } catch (Exception e) {
-
+            log.error("Error actualizando el usuario: ", e);
         } finally {
             if (session != null) {
                 session.close();
