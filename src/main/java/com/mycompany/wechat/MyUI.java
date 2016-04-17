@@ -2,20 +2,25 @@ package com.mycompany.wechat;
 
 import com.mycompany.wechat.modelo.DAO.UsuarioDAO;
 import com.mycompany.wechat.modelo.Usuario;
-import javax.servlet.annotation.WebServlet;
-
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Widgetset;
+import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Label;
+import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Image;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import java.util.ArrayList;
-import java.util.List;
+import javax.servlet.annotation.WebServlet;
 import org.apache.log4j.Logger;
 
 /**
@@ -24,30 +29,107 @@ import org.apache.log4j.Logger;
 @Theme("mytheme")
 @Widgetset("com.mycompany.wechat.MyAppWidgetset")
 public class MyUI extends UI {
+
     private static final Logger log = Logger.getLogger(MyUI.class);
-    
-    UsuarioDAO dao= new  UsuarioDAO();
-    List<Usuario> l = new ArrayList<>();
+
+    Navigator navigator;
+    public static final String MAINVIEW = "main";
+
     @Override
     protected void init(VaadinRequest vaadinRequest) {
-        final VerticalLayout layout = new VerticalLayout();
-        layout.setMargin(true);
-        setContent(layout);
 
-        Button button = new Button("Click Me");
-        button.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                log.debug("Pulsado el boton.");
-                l = dao.getListaUsuarios();
-                layout.addComponent(new Label("Usuario: " + l.get(0)));
+        getPage().setTitle("WECHAT");
+        navigator = new Navigator(this, this);
+        navigator.addView("", new LoginView());
+        navigator.addView(MAINVIEW, new VistaPrincipal());
+    }
+
+    public class LoginView extends VerticalLayout implements View, ClickListener {
+
+        final TextField textUsuario;
+        final PasswordField passUsuario;
+
+        public LoginView() {
+            addStyleName("fondo");
+            setSizeFull();
+            setMargin(true);
+            final VerticalLayout layout = new VerticalLayout();
+            layout.setMargin(true);
+            layout.setDefaultComponentAlignment(Alignment.TOP_CENTER);
+            layout.setSpacing(true);
+
+            Image img = new Image(null, new ThemeResource("wechat/img/logo.png"));
+            layout.addComponent(img);
+
+            textUsuario = new TextField("Usuario");
+            textUsuario.setInputPrompt("Correo Usuario");
+            layout.addComponent(textUsuario);
+
+            passUsuario = new PasswordField("Contraseña");
+            layout.addComponent(passUsuario);
+
+            Button boton = new Button("Conectar");
+            boton.addClickListener((Button.ClickListener) this);
+            layout.addComponent(boton);
+
+            addComponent(layout);
+
+        }
+
+        @Override
+        public void enter(ViewChangeListener.ViewChangeEvent event) {
+            textUsuario.clear();
+            passUsuario.clear();
+        }
+
+        @Override
+        public void buttonClick(Button.ClickEvent event) {
+            // Comprobar que el usuario introducido es correcto. En caso de serlo configurar
+            // la sesión y navegar a la pantalla principal.
+            String correo = textUsuario.getValue();
+            String pass = passUsuario.getValue();
+
+            if ((null != correo && correo.trim().length() > 0) && (null != pass && pass.trim().length() > 0)) {
+                // Comprobar que los datos introducidos son correctos
+                UsuarioDAO usuarioDAO = new UsuarioDAO();
+                Usuario usuario = usuarioDAO.getUsuarioByCorreo(correo);
+
+                if (null != usuario) {
+                    if(pass.equals(usuario.getClave()))
+                    {
+                        // Usuario Correcto. Creamos sesion y navegamos a pagina principal
+                        navigator.navigateTo(MAINVIEW);
+                    }
+                }
+            } else {
+                navigator.navigateTo("");
             }
-        });
-        layout.addComponent(button);
+        }
 
     }
 
-    @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
+    public class VistaPrincipal extends VerticalLayout implements View, ClickListener {
+
+        public VistaPrincipal() {
+            setSizeFull();
+            Button boton = new Button("Volver");
+            boton.addClickListener((Button.ClickListener) this);
+            addComponent(boton);
+
+        }
+
+        @Override
+        public void enter(ViewChangeListener.ViewChangeEvent event) {
+            Notification.show("Estas en la pagina principal");
+        }
+
+        @Override
+        public void buttonClick(Button.ClickEvent event) {
+            navigator.navigateTo("");
+        }
+    }
+
+    @WebServlet(urlPatterns = "/*", name = "wechat", asyncSupported = true)
     @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
     public static class MyUIServlet extends VaadinServlet {
     }

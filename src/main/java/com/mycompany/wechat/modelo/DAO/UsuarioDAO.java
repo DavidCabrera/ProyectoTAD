@@ -121,4 +121,34 @@ public class UsuarioDAO {
             }
         }
     }
+
+    /**
+     * Obtiene un usuario a traves del correo introducido
+     *
+     * @param correo del usuario
+     * @return Usuario correspondiente al correo
+     */
+    public Usuario getUsuarioByCorreo(String correo) {
+        Session session = null;
+        Usuario usuario = null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            String hql = "From Usuario where correo like '" + correo + "'";
+            Query query = session.createQuery(hql);
+            List<Usuario> listausuarios = query.list();
+            tx.commit();
+            if (null != listausuarios && listausuarios.size() == 1) {
+                usuario = listausuarios.get(0);
+            }
+        } catch (Exception e) {
+            log.error("Error obteniendo el listado de usuarios: ", e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
+        return usuario;
+    }
 }
