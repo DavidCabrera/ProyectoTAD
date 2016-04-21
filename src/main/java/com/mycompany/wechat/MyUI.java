@@ -5,6 +5,7 @@ import com.mycompany.wechat.modelo.Usuario;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Widgetset;
+import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -14,7 +15,9 @@ import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
@@ -63,6 +66,7 @@ public class MyUI extends UI {
 
             textUsuario = new TextField("Usuario");
             textUsuario.setInputPrompt("Correo Usuario");
+            textUsuario.addValidator(new EmailValidator("no es un e-mail"));
             layout.addComponent(textUsuario);
 
             passUsuario = new PasswordField("Contraseña");
@@ -88,13 +92,14 @@ public class MyUI extends UI {
             // la sesión y navegar a la pantalla principal.
             String correo = textUsuario.getValue();
             String pass = passUsuario.getValue();
+            
 
             if ((null != correo && correo.trim().length() > 0) && (null != pass && pass.trim().length() > 0)) {
                 // Comprobar que los datos introducidos son correctos
                 UsuarioDAO usuarioDAO = new UsuarioDAO();
                 Usuario usuario = usuarioDAO.getUsuarioByCorreo(correo);
-
-                if (null != usuario) {
+                
+                if (null != usuario) {                    
                     if(pass.equals(usuario.getClave()))
                     {
                         // Usuario Correcto. Creamos sesion y navegamos a pagina principal
@@ -102,6 +107,7 @@ public class MyUI extends UI {
                     }
                 }
             } else {
+                
                 navigator.navigateTo("");
             }
         }
@@ -112,10 +118,38 @@ public class MyUI extends UI {
 
         public VistaPrincipal() {
             setSizeFull();
-            Button boton = new Button("Volver");
+            Button boton = new Button("Salir");
             boton.addClickListener((Button.ClickListener) this);
-            addComponent(boton);
-
+            HorizontalLayout todo =  new HorizontalLayout();
+            todo.setStyleName("pagina_principal");
+            setDefaultComponentAlignment(Alignment.TOP_CENTER);
+            //todo.setMargin(true);           
+            VerticalLayout izq = new VerticalLayout();
+            izq.setMargin(true);
+            izq.setStyleName("pagina_principal");
+            izq.setWidth("40%");
+            izq.setHeight("500px");
+            VerticalLayout usu = new VerticalLayout();
+            
+            usu.setCaption("lista de usuarios");
+            izq.addComponent(boton);
+            izq.addComponent(new TextField("buscar"));
+            izq.addComponent(usu);
+            
+            
+            VerticalLayout der = new VerticalLayout();
+            der.setMargin(true);
+            der.setStyleName("pagina_principal");
+            der.setWidth("60%");
+            der.setHeight("500px");
+//            der.setCaption("Chat");
+            der.addComponent(new Label("chat"));
+            todo.addComponent(izq);
+            todo.addComponent(der);
+            
+            addComponent(todo);
+            
+            //addComponent(boton);
         }
 
         @Override
