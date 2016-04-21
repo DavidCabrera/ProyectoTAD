@@ -140,7 +140,7 @@ public class MyUI extends UI {
             VerticalLayout der = new VerticalLayout();
             der.setMargin(true);
             der.setStyleName("pagina_principal");
-            der.setWidth("60%");
+            der.setWidth("500px");
             der.setHeight("500px");
 //            der.setCaption("Chat");
             der.addComponent(new Label("chat"));
