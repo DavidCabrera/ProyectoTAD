@@ -2,6 +2,7 @@ package com.mycompany.wechat;
 
 import com.mycompany.wechat.modelo.DAO.UsuarioDAO;
 import com.mycompany.wechat.modelo.Usuario;
+import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Widgetset;
@@ -12,6 +13,7 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
@@ -23,12 +25,14 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import org.apache.log4j.Logger;
 
 /**
  *
  */
+@PreserveOnRefresh
 @Theme("mytheme")
 @Widgetset("com.mycompany.wechat.MyAppWidgetset")
 public class MyUI extends UI {
@@ -47,7 +51,7 @@ public class MyUI extends UI {
         navigator.addView(MAINVIEW, new VistaPrincipal());
     }
 
-    public class LoginView extends VerticalLayout implements View, ClickListener {
+    public class LoginView extends VerticalLayout implements View {
 
         final TextField textUsuario;
         final PasswordField passUsuario;
@@ -73,7 +77,32 @@ public class MyUI extends UI {
             layout.addComponent(passUsuario);
 
             Button boton = new Button("Conectar");
-            boton.addClickListener((Button.ClickListener) this);
+            boton.addClickListener(new ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    // Comprobar que el usuario introducido es correcto. En caso de serlo configurar
+                    // la sesión y navegar a la pantalla principal.
+                    String correo = textUsuario.getValue();
+                    String pass = passUsuario.getValue();
+
+                    if ((null != correo && correo.trim().length() > 0) && (null != pass && pass.trim().length() > 0)) {
+                        // Comprobar que los datos introducidos son correctos
+                        UsuarioDAO usuarioDAO = new UsuarioDAO();
+                        Usuario usuario = usuarioDAO.getUsuarioByCorreo(correo);
+
+                        if (null != usuario) {
+                            if (pass.equals(usuario.getClave())) {
+                                // Usuario Correcto. Creamos sesion y navegamos a pagina principal
+                                getSession().setAttribute("nombre", usuario.getUsuario());
+                                navigator.navigateTo(MAINVIEW);
+                            }
+                        }
+                    } else {
+
+                        navigator.navigateTo("");
+                    }
+                }
+            });
             layout.addComponent(boton);
 
             addComponent(layout);
@@ -86,41 +115,23 @@ public class MyUI extends UI {
             passUsuario.clear();
         }
 
-        @Override
-        public void buttonClick(Button.ClickEvent event) {
-            // Comprobar que el usuario introducido es correcto. En caso de serlo configurar
-            // la sesión y navegar a la pantalla principal.
-            String correo = textUsuario.getValue();
-            String pass = passUsuario.getValue();
-            
-
-            if ((null != correo && correo.trim().length() > 0) && (null != pass && pass.trim().length() > 0)) {
-                // Comprobar que los datos introducidos son correctos
-                UsuarioDAO usuarioDAO = new UsuarioDAO();
-                Usuario usuario = usuarioDAO.getUsuarioByCorreo(correo);
-                
-                if (null != usuario) {                    
-                    if(pass.equals(usuario.getClave()))
-                    {
-                        // Usuario Correcto. Creamos sesion y navegamos a pagina principal
-                        navigator.navigateTo(MAINVIEW);
-                    }
-                }
-            } else {
-                
-                navigator.navigateTo("");
-            }
-        }
-
     }
 
-    public class VistaPrincipal extends VerticalLayout implements View, ClickListener {
+    public class VistaPrincipal extends VerticalLayout implements View {
 
         public VistaPrincipal() {
             setSizeFull();
-            Button boton = new Button("Salir");
-            boton.addClickListener((Button.ClickListener) this);
-            HorizontalLayout todo =  new HorizontalLayout();
+            Button botonSalir = new Button("Salir");
+            botonSalir.addClickListener(new ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    //getSession().close();  peta porque antes de navegar se queda colgado
+                    getSession().setAttribute("nombre", "");
+                    navigator.navigateTo("");
+                }
+            });
+            HorizontalLayout todo = new HorizontalLayout();
+
             todo.setStyleName("pagina_principal");
             setDefaultComponentAlignment(Alignment.TOP_CENTER);
             //todo.setMargin(true);           
@@ -130,13 +141,27 @@ public class MyUI extends UI {
             izq.setWidth("40%");
             izq.setHeight("500px");
             VerticalLayout usu = new VerticalLayout();
-            
+
             usu.setCaption("lista de usuarios");
-            izq.addComponent(boton);
+            izq.addComponent(botonSalir);
             izq.addComponent(new TextField("buscar"));
             izq.addComponent(usu);
-            
-            
+
+            //puede ir en una funcion
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            List<Usuario> Lusu = usuarioDAO.getListaUsuarios();
+            //Table table = new Table("LISTA");
+            //table.addContainerProperty("",String.class, null);
+            int i = 1;
+            for (Usuario usuario : Lusu) {
+                //table.addItem(new Object[]{usuario.getUsuario()},i);
+                usu.addComponent(new Label(usuario.getUsuario()));
+                i++;
+
+            }
+            // usu.addComponent(table);           
+
+            //---------------         
             VerticalLayout der = new VerticalLayout();
             der.setMargin(true);
             der.setStyleName("pagina_principal");
@@ -146,21 +171,23 @@ public class MyUI extends UI {
             der.addComponent(new Label("chat"));
             todo.addComponent(izq);
             todo.addComponent(der);
-            
+
             addComponent(todo);
-            
+
             //addComponent(boton);
         }
 
         @Override
         public void enter(ViewChangeListener.ViewChangeEvent event) {
-            Notification.show("Estas en la pagina principal");
+            if(getSession().getAttribute("nombre")==""){
+                navigator.navigateTo("");
+            }else{
+            Notification.show("Bienvenido: " + getSession().getAttribute("nombre"));
+            }
         }
 
-        @Override
-        public void buttonClick(Button.ClickEvent event) {
-            navigator.navigateTo("");
-        }
+        
+
     }
 
     @WebServlet(urlPatterns = "/*", name = "wechat", asyncSupported = true)
