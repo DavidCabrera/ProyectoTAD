@@ -30,19 +30,55 @@
 @import "../valo/valo.scss";
 
 @mixin mytheme {
-  @include valo;
+    @include valo;
 
-  
-.fondo{
-    background-color: beige;
-}
 
-.pagina_principal
-{
-    border-style: solid;
-    margin-top: 20px;
-}
+    .fondo{
+        background-color: beige;
+    }
 
+    .pagina_principal
+    {
+        border-style: solid;
+        margin-top: 20px;
+    }
+
+    .parte_izquierda
+    {
+        border-right-style: solid;
+        border-right-width: 0.1px;
+        
+    }
+
+    .parte_derecha
+    {
+        height: 500px;
+    }
+
+
+    .busqueda_usuario
+    {
+        margin: 5px;
+        border-style: solid;
+        height: 30px;
+    }
+    
+    .escribir
+    {
+        margin-right: 5px;
+    }
+    
+    .mensaje
+    {
+        background-image: url("/VAADIN/themes/mytheme/wechat/img/fondoMensaje.jpg");
+        
+    }
+
+    .nombreUsuario
+    {
+        background-color: grey;
+    }
+    
 }
 
 

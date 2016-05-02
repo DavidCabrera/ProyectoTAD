@@ -10,10 +10,11 @@ import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.server.WrappedSession;
+import com.vaadin.shared.Position;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
@@ -69,8 +70,7 @@ public class MyUI extends UI {
             layout.addComponent(img);
 
             textUsuario = new TextField("Usuario");
-            textUsuario.setInputPrompt("Correo Usuario");
-            textUsuario.addValidator(new EmailValidator("no es un e-mail"));
+            textUsuario.addValidator(new EmailValidator("No es un e-mail"));
             layout.addComponent(textUsuario);
 
             passUsuario = new PasswordField("Contraseña");
@@ -95,6 +95,12 @@ public class MyUI extends UI {
                                 // Usuario Correcto. Creamos sesion y navegamos a pagina principal
                                 getSession().setAttribute("nombre", usuario.getUsuario());
                                 navigator.navigateTo(MAINVIEW);
+                            } else {
+                                navigator.navigateTo("");
+                                Notification notif = new Notification("Correo o contraseña erronea.", Notification.Type.ERROR_MESSAGE);
+                                notif.setPosition(Position.TOP_RIGHT);
+                                notif.setDelayMsec(2000);
+                                notif.show(Page.getCurrent());
                             }
                         }
                     } else {
@@ -113,6 +119,7 @@ public class MyUI extends UI {
         public void enter(ViewChangeListener.ViewChangeEvent event) {
             textUsuario.clear();
             passUsuario.clear();
+            passUsuario.setValue("");
         }
 
     }
@@ -121,72 +128,91 @@ public class MyUI extends UI {
 
         public VistaPrincipal() {
             setSizeFull();
+
+            // ------------------ IZQUIERDA ----------------------
             Button botonSalir = new Button("Salir");
             botonSalir.addClickListener(new ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     //getSession().close();  peta porque antes de navegar se queda colgado
-                    getSession().setAttribute("nombre", "");
+                    getSession().setAttribute("nombre", null);
                     navigator.navigateTo("");
                 }
             });
+
             HorizontalLayout todo = new HorizontalLayout();
 
             todo.setStyleName("pagina_principal");
             setDefaultComponentAlignment(Alignment.TOP_CENTER);
-            //todo.setMargin(true);           
             VerticalLayout izq = new VerticalLayout();
-            izq.setMargin(true);
-            izq.setStyleName("pagina_principal");
-            izq.setWidth("40%");
-            izq.setHeight("500px");
+            izq.setStyleName("parte_izquierda");
+            izq.setWidth("350px");
+            izq.setHeight("100%");
+
+            TextField textBuscar = new TextField("Buscar");
+            textBuscar.setStyleName("busqueda_usuario");
+
+            VerticalLayout vertusuario = new VerticalLayout();
+            vertusuario.addComponent(botonSalir);
+            vertusuario.setStyleName("nombreUsuario");
+            vertusuario.setHeight("100%");
+
             VerticalLayout usu = new VerticalLayout();
-
             usu.setCaption("lista de usuarios");
-            izq.addComponent(botonSalir);
-            izq.addComponent(new TextField("buscar"));
-            izq.addComponent(usu);
 
+            izq.addComponent(vertusuario);
+            izq.addComponent(textBuscar);
+            izq.addComponent(usu);
+            izq.setExpandRatio(vertusuario, 0.1f);
+            izq.setExpandRatio(textBuscar, 0.15f);
+            izq.setExpandRatio(usu, 0.75f);
             //puede ir en una funcion
             UsuarioDAO usuarioDAO = new UsuarioDAO();
             List<Usuario> Lusu = usuarioDAO.getListaUsuarios();
-            //Table table = new Table("LISTA");
-            //table.addContainerProperty("",String.class, null);
-            int i = 1;
             for (Usuario usuario : Lusu) {
-                //table.addItem(new Object[]{usuario.getUsuario()},i);
                 usu.addComponent(new Label(usuario.getUsuario()));
-                i++;
 
             }
-            // usu.addComponent(table);           
 
-            //---------------         
+            //---------------     DERECHA  ------------------------    
             VerticalLayout der = new VerticalLayout();
-            der.setMargin(true);
-            der.setStyleName("pagina_principal");
+            der.setStyleName("parte_derecha");
             der.setWidth("500px");
             der.setHeight("500px");
-//            der.setCaption("Chat");
-            der.addComponent(new Label("chat"));
+
+            VerticalLayout nombreUsuario = new VerticalLayout(new Label("NOMBRE"));
+            nombreUsuario.setStyleName("nombreUsuario");
+            nombreUsuario.setHeight("100%");
+            der.addComponent(nombreUsuario);
+            VerticalLayout texto = new VerticalLayout(new Label("MENSAJE"));
+            texto.setStyleName("mensaje");
+            texto.setHeight("100%");
+            TextField escribir = new TextField();
+            escribir.setInputPrompt("Escriba su mensaje...");
+            escribir.setWidth("100%");
+            escribir.setStyleName("escribir");
+            der.addComponent(texto);
+            der.addComponent(escribir);
+
+            der.setExpandRatio(nombreUsuario, 0.1f);
+            der.setExpandRatio(texto, 0.75f);
+            der.setExpandRatio(escribir, 0.15f);
+
             todo.addComponent(izq);
             todo.addComponent(der);
 
             addComponent(todo);
 
-            //addComponent(boton);
         }
 
         @Override
         public void enter(ViewChangeListener.ViewChangeEvent event) {
-            if(getSession().getAttribute("nombre")==""){
+            if (getSession().getAttribute("nombre") == null || getSession().getAttribute("nombre") == "") {
                 navigator.navigateTo("");
-            }else{
-            Notification.show("Bienvenido: " + getSession().getAttribute("nombre"));
+            } else {
+                Notification.show("Bienvenido: " + getSession().getAttribute("nombre"));
             }
         }
-
-        
 
     }
 
