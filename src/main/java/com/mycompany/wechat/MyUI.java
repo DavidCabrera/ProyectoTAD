@@ -93,7 +93,7 @@ public class MyUI extends UI {
                         if (null != usuario) {
                             if (pass.equals(usuario.getClave())) {
                                 // Usuario Correcto. Creamos sesion y navegamos a pagina principal
-                                getSession().setAttribute("nombre", usuario.getUsuario());
+                                getSession().setAttribute("usuario", usuario);
                                 navigator.navigateTo(MAINVIEW);
                             } else {
                                 navigator.navigateTo("");
@@ -126,20 +126,15 @@ public class MyUI extends UI {
 
     public class VistaPrincipal extends VerticalLayout implements View {
 
+        HorizontalLayout vertusuario = new HorizontalLayout();
+        VerticalLayout layoutUsuario = new VerticalLayout();
+        VerticalLayout nombreUsuario = new VerticalLayout();
+        VerticalLayout texto = new VerticalLayout(new Label("MENSAJE"));
+
         public VistaPrincipal() {
             setSizeFull();
 
             // ------------------ IZQUIERDA ----------------------
-            Button botonSalir = new Button("Salir");
-            botonSalir.addClickListener(new ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    //getSession().close();  peta porque antes de navegar se queda colgado
-                    getSession().setAttribute("nombre", null);
-                    navigator.navigateTo("");
-                }
-            });
-
             HorizontalLayout todo = new HorizontalLayout();
 
             todo.setStyleName("pagina_principal");
@@ -152,27 +147,18 @@ public class MyUI extends UI {
             TextField textBuscar = new TextField("Buscar");
             textBuscar.setStyleName("busqueda_usuario");
 
-            VerticalLayout vertusuario = new VerticalLayout();
-            vertusuario.addComponent(botonSalir);
             vertusuario.setStyleName("nombreUsuario");
             vertusuario.setHeight("100%");
+            vertusuario.setWidth("100%");
 
-            VerticalLayout usu = new VerticalLayout();
-            usu.setCaption("lista de usuarios");
+            layoutUsuario.setCaption("Listado de Ssuarios");
 
             izq.addComponent(vertusuario);
             izq.addComponent(textBuscar);
-            izq.addComponent(usu);
+            izq.addComponent(layoutUsuario);
             izq.setExpandRatio(vertusuario, 0.1f);
             izq.setExpandRatio(textBuscar, 0.15f);
-            izq.setExpandRatio(usu, 0.75f);
-            //puede ir en una funcion
-            UsuarioDAO usuarioDAO = new UsuarioDAO();
-            List<Usuario> Lusu = usuarioDAO.getListaUsuarios();
-            for (Usuario usuario : Lusu) {
-                usu.addComponent(new Label(usuario.getUsuario()));
-
-            }
+            izq.setExpandRatio(layoutUsuario, 0.75f);
 
             //---------------     DERECHA  ------------------------    
             VerticalLayout der = new VerticalLayout();
@@ -180,16 +166,16 @@ public class MyUI extends UI {
             der.setWidth("500px");
             der.setHeight("500px");
 
-            VerticalLayout nombreUsuario = new VerticalLayout(new Label("NOMBRE"));
             nombreUsuario.setStyleName("nombreUsuario");
             nombreUsuario.setHeight("100%");
             der.addComponent(nombreUsuario);
-            VerticalLayout texto = new VerticalLayout(new Label("MENSAJE"));
+
             texto.setStyleName("mensaje");
             texto.setHeight("100%");
             TextField escribir = new TextField();
             escribir.setInputPrompt("Escriba su mensaje...");
             escribir.setWidth("100%");
+            escribir.setHeight("100%");
             escribir.setStyleName("escribir");
             der.addComponent(texto);
             der.addComponent(escribir);
@@ -207,10 +193,48 @@ public class MyUI extends UI {
 
         @Override
         public void enter(ViewChangeListener.ViewChangeEvent event) {
-            if (getSession().getAttribute("nombre") == null || getSession().getAttribute("nombre") == "") {
+            if (getSession().getAttribute("usuario") == null) {
                 navigator.navigateTo("");
             } else {
-                Notification.show("Bienvenido: " + getSession().getAttribute("nombre"));
+                Notification.show("Bienvenido: " + ((Usuario) getSession().getAttribute("usuario")).getUsuario());
+
+                Usuario usuario = (Usuario) getSession().getAttribute("usuario");
+                UsuarioDAO usuarioDAO = new UsuarioDAO();
+                List<Usuario> Lusu = usuarioDAO.getListaUsuariosParaChatear(usuario);
+
+                if (null != Lusu && !Lusu.isEmpty()) {
+                    for (Usuario usuarioItem : Lusu) {
+                        Button usu = new Button(usuarioItem.getUsuario());
+                        usu.setWidth("100%");
+                        usu.addClickListener(new ClickListener() {
+                            @Override
+                            public void buttonClick(Button.ClickEvent event) {
+                                // Cargar conversación
+                            }
+                        });
+                        layoutUsuario.addComponent(usu);
+
+                    }
+                } else {
+                    layoutUsuario.addComponent(new Label("No hay usuarios en la aplicación."));
+                }
+
+                Label usuarioLogado = new Label(usuario.getUsuario());
+                vertusuario.addComponent(usuarioLogado);
+
+                Button botonSalir = new Button("Salir");
+                botonSalir.addClickListener(new ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent event) {
+                        //getSession().close();  peta porque antes de navegar se queda colgado
+                        getSession().setAttribute("usuario", null);
+                        navigator.navigateTo("");
+                    }
+                });
+                vertusuario.addComponent(botonSalir);
+                
+                vertusuario.setExpandRatio(usuarioLogado, 0.78f);
+                vertusuario.setExpandRatio(botonSalir, 0.22f);
             }
         }
 
