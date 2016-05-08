@@ -65,7 +65,8 @@ public class ConversacionDAO {
         try {
             session = HibernateUtil.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
-            session.save(conversacion);
+            session.saveOrUpdate(conversacion);
+            session.flush();
             tx.commit();
         } catch (Exception e) {
             log.error("Error insertando una conversación: ", e);

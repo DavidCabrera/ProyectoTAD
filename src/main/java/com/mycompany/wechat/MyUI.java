@@ -1,7 +1,11 @@
 package com.mycompany.wechat;
 
+import com.mycompany.wechat.modelo.Conversacion;
+import com.mycompany.wechat.modelo.DAO.ConversacionDAO;
 import com.mycompany.wechat.modelo.DAO.UsuarioDAO;
+import com.mycompany.wechat.modelo.DAO.UsuarioTieneConversacionDAO;
 import com.mycompany.wechat.modelo.Usuario;
+import com.mycompany.wechat.modelo.UsuarioTieneConversacion;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -26,6 +30,7 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import java.util.Date;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import org.apache.log4j.Logger;
@@ -151,8 +156,8 @@ public class MyUI extends UI {
             vertusuario.setHeight("100%");
             vertusuario.setWidth("100%");
 
-            layoutUsuario.setCaption("Listado de Ssuarios");
-
+            layoutUsuario.setCaption("Listado de Usuarios");
+            
             izq.addComponent(vertusuario);
             izq.addComponent(textBuscar);
             izq.addComponent(layoutUsuario);
@@ -196,20 +201,24 @@ public class MyUI extends UI {
             if (getSession().getAttribute("usuario") == null) {
                 navigator.navigateTo("");
             } else {
-                Notification.show("Bienvenido: " + ((Usuario) getSession().getAttribute("usuario")).getUsuario());
+                Notification.show("Bienvenido " + ((Usuario) getSession().getAttribute("usuario")).getUsuario());
 
-                Usuario usuario = (Usuario) getSession().getAttribute("usuario");
+                final Usuario usuario = (Usuario) getSession().getAttribute("usuario");
                 UsuarioDAO usuarioDAO = new UsuarioDAO();
                 List<Usuario> Lusu = usuarioDAO.getListaUsuariosParaChatear(usuario);
-
+                
                 if (null != Lusu && !Lusu.isEmpty()) {
                     for (Usuario usuarioItem : Lusu) {
+                        final Usuario usuarioChat = usuarioItem;
                         Button usu = new Button(usuarioItem.getUsuario());
                         usu.setWidth("100%");
                         usu.addClickListener(new ClickListener() {
                             @Override
                             public void buttonClick(Button.ClickEvent event) {
+                                nombreUsuario.removeAllComponents();
+                                nombreUsuario.addComponent(new Label(usuarioChat.getUsuario()));
                                 // Cargar conversación
+                                final Conversacion conversacion = crearConversacion(usuario, usuarioChat);
                             }
                         });
                         layoutUsuario.addComponent(usu);
@@ -232,7 +241,7 @@ public class MyUI extends UI {
                     }
                 });
                 vertusuario.addComponent(botonSalir);
-                
+
                 vertusuario.setExpandRatio(usuarioLogado, 0.78f);
                 vertusuario.setExpandRatio(botonSalir, 0.22f);
             }
@@ -243,5 +252,33 @@ public class MyUI extends UI {
     @WebServlet(urlPatterns = "/*", name = "wechat", asyncSupported = true)
     @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
     public static class MyUIServlet extends VaadinServlet {
+    }
+
+    public Conversacion crearConversacion(Usuario usuarioLogado, Usuario usuarioChat) {
+        
+        Conversacion conversacion = null;
+        UsuarioTieneConversacionDAO usuarioConversacionDAO = new UsuarioTieneConversacionDAO();
+
+        List<UsuarioTieneConversacion> listadoConversaciones = usuarioConversacionDAO.getTieneConversacion(usuarioLogado, usuarioChat);
+
+        if (null == listadoConversaciones || listadoConversaciones.isEmpty()) {
+
+            conversacion = new Conversacion();
+            
+            conversacion.setFecha(new Date());
+            conversacion.setNumParticipantes(2);
+            conversacion.setNombre("Conversación entre " + usuarioLogado.getUsuario() + " y " + usuarioChat.getUsuario());
+            
+            ConversacionDAO conversacionDAO = new ConversacionDAO();
+            conversacionDAO.addConversacion(conversacion);
+            
+            usuarioConversacionDAO.crearConversacion(usuarioLogado, usuarioChat, conversacion);
+            
+        }
+        else
+        {
+            conversacion = listadoConversaciones.get(0).getConversacion();
+        }
+        return conversacion;
     }
 }

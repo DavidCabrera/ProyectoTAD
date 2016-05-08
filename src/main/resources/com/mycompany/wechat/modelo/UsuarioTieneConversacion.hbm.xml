@@ -12,7 +12,7 @@
                 <column name="idConversacion" />
             </key-property>
         </composite-id>
-        <many-to-one name="conversacion" class="com.mycompany.wechat.modelo.Conversacion" update="false" insert="false" fetch="select">
+        <many-to-one name="conversacion" class="com.mycompany.wechat.modelo.Conversacion" update="false" insert="false" fetch="select" cascade="all">
             <column name="idConversacion" not-null="true" />
         </many-to-one>
         <many-to-one name="usuario" class="com.mycompany.wechat.modelo.Usuario" update="false" insert="false" fetch="select">
