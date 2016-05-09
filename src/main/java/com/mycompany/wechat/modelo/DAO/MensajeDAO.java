@@ -7,6 +7,7 @@ package com.mycompany.wechat.modelo.DAO;
 
 import com.mycompany.wechat.modelo.HibernateUtil;
 import com.mycompany.wechat.modelo.Mensaje;
+import com.mycompany.wechat.modelo.Usuario;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
@@ -118,5 +119,31 @@ public class MensajeDAO {
                 session.close();
             }
         }
+    }
+    
+    /**
+     * Obtener los mensajes de un usuario concreto
+     *
+     * @param usuario Usuario seleccionado en la lista
+     * @return Listado de mensajes
+     */
+    public List<Mensaje> getMensajesDeUsuario(Usuario usuario) {
+        Session session = null;
+        List<Mensaje> listadoMensajes = null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            String hql = "From Mensaje WHERE idUsuario='" + usuario.getIdUsuario() + "' ";
+            Query query = session.createQuery(hql);
+            listadoMensajes = query.list();
+            tx.commit();
+        } catch (Exception e) {
+            log.error("Error obteniendo el listado de mensajes: ", e);
+        } finally {
+            if (null != session) {
+                session.close();
+            }
+        }
+        return listadoMensajes;
     }
 }

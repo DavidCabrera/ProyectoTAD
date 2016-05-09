@@ -149,15 +149,62 @@ public class MyUI extends UI {
             izq.setWidth("350px");
             izq.setHeight("100%");
 
-            TextField textBuscar = new TextField("Buscar");
+            final TextField textBuscar = new TextField("Buscar");
             textBuscar.setStyleName("busqueda_usuario");
 
+            Button botonBuscar = new Button("Buscar");
+
+            botonBuscar.addClickListener(new ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    String contenido = textBuscar.getValue();
+                    UsuarioDAO usuDAO = new UsuarioDAO();
+                    final Usuario usuario = (Usuario) getSession().getAttribute("usuario");
+                    String logueado = usuario.getUsuario();
+                    List<Usuario> Lusu = usuDAO.getListaFiltroUsuarios(contenido, logueado);
+                    layoutUsuario.removeAllComponents();
+                     if (null != Lusu && !Lusu.isEmpty()) {
+                        for (Usuario usuarioItem : Lusu) {
+                            final Usuario usuarioChat = usuarioItem;
+                            Button usu = new Button(usuarioItem.getUsuario());
+                            usu.setWidth("100%");
+//                            usu.addClickListener(new ClickListener() {
+//                                @Override
+//                                public void buttonClick(Button.ClickEvent event) {
+//                                    nombreUsuario.removeAllComponents();
+//                                    nombreUsuario.addComponent(new Label(usuarioChat.getUsuario()));
+//                                    // Cargar conversación
+//                                    final Conversacion conversacion = crearConversacion(usuario, usuarioChat);
+//                                }
+//                            });
+                            layoutUsuario.addComponent(usu);
+
+                        }
+                    } else {
+                        layoutUsuario.addComponent(new Label("No hay usuarios en la aplicación."));
+                    }
+
+                    
+                }
+            });
+            izq.addComponent(botonBuscar);
+
+//            textBuscar.
+//            textBuscar.setImmediate(true);
+//            OnEnterKeyHandler onEnterHandler = new OnEnterKeyHandler() {
+//                @Override
+//                public void onEnterKeyPressed() {
+//                    Notification.show("Voight Kampff Test",
+//                            Notification.Type.HUMANIZED_MESSAGE);
+//                }
+//            };
+//            onEnterHandler.installOn(textBuscar);
             vertusuario.setStyleName("nombreUsuario");
             vertusuario.setHeight("100%");
             vertusuario.setWidth("100%");
 
             layoutUsuario.setCaption("Listado de Usuarios");
-            
+
             izq.addComponent(vertusuario);
             izq.addComponent(textBuscar);
             izq.addComponent(layoutUsuario);
@@ -206,7 +253,7 @@ public class MyUI extends UI {
                 final Usuario usuario = (Usuario) getSession().getAttribute("usuario");
                 UsuarioDAO usuarioDAO = new UsuarioDAO();
                 List<Usuario> Lusu = usuarioDAO.getListaUsuariosParaChatear(usuario);
-                
+
                 if (null != Lusu && !Lusu.isEmpty()) {
                     for (Usuario usuarioItem : Lusu) {
                         final Usuario usuarioChat = usuarioItem;
@@ -255,7 +302,7 @@ public class MyUI extends UI {
     }
 
     public Conversacion crearConversacion(Usuario usuarioLogado, Usuario usuarioChat) {
-        
+
         Conversacion conversacion = null;
         UsuarioTieneConversacionDAO usuarioConversacionDAO = new UsuarioTieneConversacionDAO();
 
@@ -264,21 +311,19 @@ public class MyUI extends UI {
         if (null == listadoConversaciones || listadoConversaciones.isEmpty()) {
 
             conversacion = new Conversacion();
-            
+
             conversacion.setFecha(new Date());
             conversacion.setNumParticipantes(2);
             conversacion.setNombre("Conversación entre " + usuarioLogado.getUsuario() + " y " + usuarioChat.getUsuario());
-            
+
             ConversacionDAO conversacionDAO = new ConversacionDAO();
             conversacionDAO.addConversacion(conversacion);
-            
+
             usuarioConversacionDAO.crearConversacion(usuarioLogado, usuarioChat, conversacion);
-            
-        }
-        else
-        {
+
+        } else {
             conversacion = listadoConversaciones.get(0).getConversacion();
         }
         return conversacion;
-    }
+    } 
 }

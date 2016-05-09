@@ -84,6 +84,37 @@ public class UsuarioDAO {
         return listausuarios;
     }
 
+    
+    
+        /**
+     * Obtiene el listado  de usuarios con los que puede chatear
+     *
+     * @param usuario Usuario al que buscamos
+     * @return Listado de usuarios
+     */
+    public List<Usuario> getListaFiltroUsuarios(String usuario, String logueado) {
+        Session session = null;
+        List<Usuario> listausuarios = null;
+
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            String hql = "From Usuario where usuario like '%"+usuario+"%' and usuario not like '"+logueado+"' ";
+            Query query = session.createQuery(hql);
+            listausuarios = query.list();
+            tx.commit();
+        } catch (Exception e) {
+            log.error("Error obteniendo el listado de usuarios: ", e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
+        return listausuarios;
+    }
+    
+    
     /**
      * Inserta el usuario pasado por parámetro
      *
