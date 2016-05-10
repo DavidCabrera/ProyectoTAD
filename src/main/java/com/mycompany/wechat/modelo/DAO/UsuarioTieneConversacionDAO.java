@@ -38,12 +38,12 @@ public class UsuarioTieneConversacionDAO {
             String hql2 = "From UsuarioTieneConversacion where idUsuario ='"+chats.getIdUsuario()+"'";
 //            String hql = "From usuario_tiene_conversacion as ustc , conversacion as c, mensaje as m where ustc.idConversacion = c.idConversacion and c.idConversacion=m.idConversacion  and ustc.idUsuario='"+logado+"'";
             Query query = session.createQuery(hql);
-            Query query2 = session.createQuery(hql);
+            Query query2 = session.createQuery(hql2);
             listaConversacion = query.list();
             listaConversacion2 = query2.list();
             for (UsuarioTieneConversacion u2 : listaConversacion2) {
-                for (UsuarioTieneConversacion u : listaConversacion) {
-                    if(u.getId().equals(u2.getId())){
+                for (UsuarioTieneConversacion u : listaConversacion) {                    
+                    if(u.getConversacion().getIdConversacion()==(u2.getConversacion().getIdConversacion())){
                         listaConversacion3.add(u);
                     }
                 }

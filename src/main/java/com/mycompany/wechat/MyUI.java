@@ -2,14 +2,17 @@ package com.mycompany.wechat;
 
 import com.mycompany.wechat.modelo.Conversacion;
 import com.mycompany.wechat.modelo.DAO.ConversacionDAO;
+import com.mycompany.wechat.modelo.DAO.MensajeDAO;
 import com.mycompany.wechat.modelo.DAO.UsuarioDAO;
 import com.mycompany.wechat.modelo.DAO.UsuarioTieneConversacionDAO;
+import com.mycompany.wechat.modelo.Mensaje;
 import com.mycompany.wechat.modelo.Usuario;
 import com.mycompany.wechat.modelo.UsuarioTieneConversacion;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Widgetset;
+import com.vaadin.data.Property;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
@@ -294,6 +297,14 @@ public class MyUI extends UI {
                                 nombreUsuario.addComponent(new Label(usuarioChat.getUsuario()));
                                 // Cargar conversación
                                 final Conversacion conversacion = crearConversacion(usuarioLogueado, usuarioChat);
+                                List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(conversacion);
+                                texto.removeAllComponents();
+                                for (int i = 0; i < ms.size(); i++) {
+                                     texto.addComponent(new Label(ms.get(i).getTexto()));
+                                    
+                                }
+                               
+                                
                             }
                         });
                         layoutUsuario.addComponent(usu);

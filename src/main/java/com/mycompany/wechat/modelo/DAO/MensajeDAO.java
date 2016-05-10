@@ -5,6 +5,7 @@
  */
 package com.mycompany.wechat.modelo.DAO;
 
+import com.mycompany.wechat.modelo.Conversacion;
 import com.mycompany.wechat.modelo.HibernateUtil;
 import com.mycompany.wechat.modelo.Mensaje;
 import com.mycompany.wechat.modelo.Usuario;
@@ -134,6 +135,31 @@ public class MensajeDAO {
             session = HibernateUtil.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
             String hql = "From Mensaje WHERE idUsuario='" + usuario.getIdUsuario() + "' ";
+            Query query = session.createQuery(hql);
+            listadoMensajes = query.list();
+            tx.commit();
+        } catch (Exception e) {
+            log.error("Error obteniendo el listado de mensajes: ", e);
+        } finally {
+            if (null != session) {
+                session.close();
+            }
+        }
+        return listadoMensajes;
+    }
+    /**
+     * Obtener los mensajes de una conversacion concreta
+     *
+     * @param conversacion conversacion seleccionada por el usuario
+     * @return Listado de mensajes
+     */
+    public List<Mensaje> getMensajesDeConversacion(Conversacion conversacion) {
+        Session session = null;
+        List<Mensaje> listadoMensajes = null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            String hql = "From Mensaje WHERE idConversacion='" + conversacion.getIdConversacion() + "' ";
             Query query = session.createQuery(hql);
             listadoMensajes = query.list();
             tx.commit();
