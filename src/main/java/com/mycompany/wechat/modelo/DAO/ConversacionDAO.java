@@ -54,6 +54,30 @@ public class ConversacionDAO {
         }
         return listadoConversaciones;
     }
+    /**
+     * Obtiene una conversacion
+     *
+     * @return Listado de conversaciones
+     */
+    public Conversacion getConversacion() {
+        Session session = null;
+        Conversacion conversacion = null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            String hql = "From Conversacion";
+            Query query = session.createQuery(hql);
+            conversacion = (Conversacion) query.list().get(0);
+            tx.commit();
+        } catch (Exception e) {
+            log.error("Error al obtener la conversacion: ", e);
+        } finally {
+            if (null != session) {
+                session.close();
+            }
+        }
+        return conversacion;
+    }
 
     /**
      * Inserta la conversación pasada por parámetro

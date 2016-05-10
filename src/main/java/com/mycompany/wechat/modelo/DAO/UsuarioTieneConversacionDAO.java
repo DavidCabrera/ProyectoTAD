@@ -28,13 +28,28 @@ public class UsuarioTieneConversacionDAO {
     public List<UsuarioTieneConversacion> getTieneConversacion(Usuario logado, Usuario chats)
     {
         List<UsuarioTieneConversacion> listaConversacion = new ArrayList<UsuarioTieneConversacion>();
+        List<UsuarioTieneConversacion> listaConversacion2 = new ArrayList<UsuarioTieneConversacion>();
+        List<UsuarioTieneConversacion> listaConversacion3 = new ArrayList<UsuarioTieneConversacion>();
          Session session = null;
         try {
             session = HibernateUtil.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
-            String hql = "From UsuarioTieneConversacion where idUsuario in ("+logado.getIdUsuario()+","+chats.getIdUsuario()+")";
+            String hql = "From UsuarioTieneConversacion where idUsuario ='"+logado.getIdUsuario()+"'";
+            String hql2 = "From UsuarioTieneConversacion where idUsuario ='"+chats.getIdUsuario()+"'";
+//            String hql = "From usuario_tiene_conversacion as ustc , conversacion as c, mensaje as m where ustc.idConversacion = c.idConversacion and c.idConversacion=m.idConversacion  and ustc.idUsuario='"+logado+"'";
             Query query = session.createQuery(hql);
+            Query query2 = session.createQuery(hql);
             listaConversacion = query.list();
+            listaConversacion2 = query2.list();
+            for (UsuarioTieneConversacion u2 : listaConversacion2) {
+                for (UsuarioTieneConversacion u : listaConversacion) {
+                    if(u.getId().equals(u2.getId())){
+                        listaConversacion3.add(u);
+                    }
+                }
+                
+            }
+            
             tx.commit();
         } catch (Exception e) {
             log.error("Error obteniendo el listado de mensajes: ", e);
@@ -44,7 +59,7 @@ public class UsuarioTieneConversacionDAO {
             }
         }
         
-        return listaConversacion;
+        return listaConversacion3;
     } 
     
     

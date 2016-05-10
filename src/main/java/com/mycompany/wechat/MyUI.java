@@ -337,7 +337,7 @@ public class MyUI extends UI {
 
         List<UsuarioTieneConversacion> listadoConversaciones = usuarioConversacionDAO.getTieneConversacion(usuarioLogado, usuarioChat);
 
-        if (null == listadoConversaciones || listadoConversaciones.isEmpty()) {
+        if (listadoConversaciones == null || listadoConversaciones.isEmpty()) {
 
             conversacion = new Conversacion();
 
@@ -347,7 +347,9 @@ public class MyUI extends UI {
 
             ConversacionDAO conversacionDAO = new ConversacionDAO();
             conversacionDAO.addConversacion(conversacion);
-
+            
+            List<Conversacion> c = conversacionDAO.getAllConversaciones();
+            conversacion = c.get(c.size()-1);
             usuarioConversacionDAO.crearConversacion(usuarioLogado, usuarioChat, conversacion);
 
         } else {
