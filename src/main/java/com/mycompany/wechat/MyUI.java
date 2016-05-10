@@ -23,6 +23,7 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.Position;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
@@ -200,9 +201,19 @@ public class MyUI extends UI {
                                     final Conversacion conversacion = crearConversacion(usuarioLogueado, usuarioChat);
                                     List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(conversacion);
                                     texto.removeAllComponents();
-                                    for (int i = 0; i < ms.size(); i++) {
-                                        texto.addComponent(new Label(ms.get(i).getTexto()));
-
+                                   for (int i = 0; i < ms.size(); i++) {
+                                        Mensaje m = ms.get(i);
+                                        if(m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())){
+                                            //si soy yo alinear a la derecha
+                                            Label l = new Label("<div align='right'>"+ms.get(i).getTexto()+"</div>", ContentMode.HTML);                                            
+                                             texto.addComponent(l);                                             
+                                        }else{
+                                            //si es el otro alinear izq
+                                            String aux= "<div align='left'>"+ms.get(i).getTexto()+"</div>";
+                                            Label l = new Label(aux, ContentMode.HTML);                                            
+                                             texto.addComponent(l);
+                                            
+                                        }                                        
                                     }
                                 }
                             });
@@ -297,9 +308,19 @@ public class MyUI extends UI {
                                 List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(conversacion);
                                 texto.removeAllComponents();
                                 for (int i = 0; i < ms.size(); i++) {
-                                    texto.addComponent(new Label(ms.get(i).getTexto()));
-
-                                }
+                                        Mensaje m = ms.get(i);
+                                        if(m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())){
+                                            //si soy yo alinear a la derecha
+                                            Label l = new Label("<div align='right'>"+ms.get(i).getTexto()+"</div>", ContentMode.HTML);                                            
+                                             texto.addComponent(l);
+                                             
+                                        }else{
+                                            //si es el otro alinear izq
+                                            String aux= "<div align='left'>"+ms.get(i).getTexto()+"</div>";
+                                            Label l = new Label(aux, ContentMode.HTML);                                            
+                                             texto.addComponent(l);                                            
+                                        }                                        
+                                    }
                             }
                         });
                         layoutUsuario.addComponent(usu);
