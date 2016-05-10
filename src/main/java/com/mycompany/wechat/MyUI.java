@@ -14,6 +14,7 @@ import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
@@ -25,6 +26,7 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
@@ -54,7 +56,29 @@ public class MyUI extends UI {
         getPage().setTitle("WECHAT");
         navigator = new Navigator(this, this);
         navigator.addView("", new LoginView());
+        navigator.addView("salir", new SalirView());
         navigator.addView(MAINVIEW, new VistaPrincipal());
+    }
+
+    private static class SalirView extends VerticalLayout implements View {
+
+        public SalirView() {
+           
+        }
+
+        @Override
+        public void enter(ViewChangeListener.ViewChangeEvent event) {
+            getSession().close();
+            Link link = new Link("volver al login", new ExternalResource("/*"));
+            addComponent(link);
+//            Button login = new Button("login");
+//            login.addClickListener(new ClickListener() {
+//                @Override
+//                public void buttonClick(Button.ClickEvent event) {
+//                    Link link = new Link("volver al login", new ExternalResource("/*"));
+//                }
+//            });
+        }
     }
 
     public class LoginView extends VerticalLayout implements View {
@@ -63,6 +87,9 @@ public class MyUI extends UI {
         final PasswordField passUsuario;
 
         public LoginView() {
+            
+            
+            
             addStyleName("fondo");
             setSizeFull();
             setMargin(true);
@@ -135,6 +162,7 @@ public class MyUI extends UI {
         VerticalLayout layoutUsuario = new VerticalLayout();
         VerticalLayout nombreUsuario = new VerticalLayout();
         VerticalLayout texto = new VerticalLayout(new Label("MENSAJE"));
+        Usuario usuarioLogueado;
 
         public VistaPrincipal() {
             setSizeFull();
@@ -159,8 +187,8 @@ public class MyUI extends UI {
                 public void buttonClick(Button.ClickEvent event) {
                     String contenido = textBuscar.getValue();
                     UsuarioDAO usuDAO = new UsuarioDAO();
-                    final Usuario usuario = (Usuario) getSession().getAttribute("usuario");
-                    String logueado = usuario.getUsuario();
+                   // final Usuario usuario = (Usuario) getSession().getAttribute("usuario");
+                    String logueado = usuarioLogueado.getUsuario();
                     List<Usuario> Lusu = usuDAO.getListaFiltroUsuarios(contenido, logueado);
                     layoutUsuario.removeAllComponents();
                      if (null != Lusu && !Lusu.isEmpty()) {
@@ -168,15 +196,15 @@ public class MyUI extends UI {
                             final Usuario usuarioChat = usuarioItem;
                             Button usu = new Button(usuarioItem.getUsuario());
                             usu.setWidth("100%");
-//                            usu.addClickListener(new ClickListener() {
-//                                @Override
-//                                public void buttonClick(Button.ClickEvent event) {
-//                                    nombreUsuario.removeAllComponents();
-//                                    nombreUsuario.addComponent(new Label(usuarioChat.getUsuario()));
-//                                    // Cargar conversación
-//                                    final Conversacion conversacion = crearConversacion(usuario, usuarioChat);
-//                                }
-//                            });
+                            usu.addClickListener(new ClickListener() {
+                                @Override
+                                public void buttonClick(Button.ClickEvent event) {
+                                    nombreUsuario.removeAllComponents();
+                                    nombreUsuario.addComponent(new Label(usuarioChat.getUsuario()));
+                                    // Cargar conversación
+                                    final Conversacion conversacion = crearConversacion(usuarioLogueado, usuarioChat);
+                                }
+                            });
                             layoutUsuario.addComponent(usu);
 
                         }
@@ -250,9 +278,9 @@ public class MyUI extends UI {
             } else {
                 Notification.show("Bienvenido " + ((Usuario) getSession().getAttribute("usuario")).getUsuario());
 
-                final Usuario usuario = (Usuario) getSession().getAttribute("usuario");
+                usuarioLogueado = (Usuario) getSession().getAttribute("usuario");
                 UsuarioDAO usuarioDAO = new UsuarioDAO();
-                List<Usuario> Lusu = usuarioDAO.getListaUsuariosParaChatear(usuario);
+                List<Usuario> Lusu = usuarioDAO.getListaUsuariosParaChatear(usuarioLogueado);
 
                 if (null != Lusu && !Lusu.isEmpty()) {
                     for (Usuario usuarioItem : Lusu) {
@@ -265,7 +293,7 @@ public class MyUI extends UI {
                                 nombreUsuario.removeAllComponents();
                                 nombreUsuario.addComponent(new Label(usuarioChat.getUsuario()));
                                 // Cargar conversación
-                                final Conversacion conversacion = crearConversacion(usuario, usuarioChat);
+                                final Conversacion conversacion = crearConversacion(usuarioLogueado, usuarioChat);
                             }
                         });
                         layoutUsuario.addComponent(usu);
@@ -275,7 +303,7 @@ public class MyUI extends UI {
                     layoutUsuario.addComponent(new Label("No hay usuarios en la aplicación."));
                 }
 
-                Label usuarioLogado = new Label(usuario.getUsuario());
+                Label usuarioLogado = new Label(usuarioLogueado.getUsuario());
                 vertusuario.addComponent(usuarioLogado);
 
                 Button botonSalir = new Button("Salir");
@@ -284,7 +312,8 @@ public class MyUI extends UI {
                     public void buttonClick(Button.ClickEvent event) {
                         //getSession().close();  peta porque antes de navegar se queda colgado
                         getSession().setAttribute("usuario", null);
-                        navigator.navigateTo("");
+                        
+                        navigator.navigateTo("salir");
                     }
                 });
                 vertusuario.addComponent(botonSalir);
