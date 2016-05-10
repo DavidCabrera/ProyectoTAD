@@ -66,7 +66,7 @@ public class MyUI extends UI {
     private static class SalirView extends VerticalLayout implements View {
 
         public SalirView() {
-           
+
         }
 
         @Override
@@ -74,13 +74,7 @@ public class MyUI extends UI {
             getSession().close();
             Link link = new Link("volver al login", new ExternalResource("/*"));
             addComponent(link);
-//            Button login = new Button("login");
-//            login.addClickListener(new ClickListener() {
-//                @Override
-//                public void buttonClick(Button.ClickEvent event) {
-//                    Link link = new Link("volver al login", new ExternalResource("/*"));
-//                }
-//            });
+
         }
     }
 
@@ -90,9 +84,7 @@ public class MyUI extends UI {
         final PasswordField passUsuario;
 
         public LoginView() {
-            
-            
-            
+
             addStyleName("fondo");
             setSizeFull();
             setMargin(true);
@@ -190,11 +182,11 @@ public class MyUI extends UI {
                 public void buttonClick(Button.ClickEvent event) {
                     String contenido = textBuscar.getValue();
                     UsuarioDAO usuDAO = new UsuarioDAO();
-                   // final Usuario usuario = (Usuario) getSession().getAttribute("usuario");
+                    // final Usuario usuario = (Usuario) getSession().getAttribute("usuario");
                     String logueado = usuarioLogueado.getUsuario();
                     List<Usuario> Lusu = usuDAO.getListaFiltroUsuarios(contenido, logueado);
                     layoutUsuario.removeAllComponents();
-                     if (null != Lusu && !Lusu.isEmpty()) {
+                    if (null != Lusu && !Lusu.isEmpty()) {
                         for (Usuario usuarioItem : Lusu) {
                             final Usuario usuarioChat = usuarioItem;
                             Button usu = new Button(usuarioItem.getUsuario());
@@ -206,6 +198,12 @@ public class MyUI extends UI {
                                     nombreUsuario.addComponent(new Label(usuarioChat.getUsuario()));
                                     // Cargar conversación
                                     final Conversacion conversacion = crearConversacion(usuarioLogueado, usuarioChat);
+                                    List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(conversacion);
+                                    texto.removeAllComponents();
+                                    for (int i = 0; i < ms.size(); i++) {
+                                        texto.addComponent(new Label(ms.get(i).getTexto()));
+
+                                    }
                                 }
                             });
                             layoutUsuario.addComponent(usu);
@@ -215,7 +213,6 @@ public class MyUI extends UI {
                         layoutUsuario.addComponent(new Label("No hay usuarios en la aplicación."));
                     }
 
-                    
                 }
             });
             izq.addComponent(botonBuscar);
@@ -300,11 +297,9 @@ public class MyUI extends UI {
                                 List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(conversacion);
                                 texto.removeAllComponents();
                                 for (int i = 0; i < ms.size(); i++) {
-                                     texto.addComponent(new Label(ms.get(i).getTexto()));
-                                    
+                                    texto.addComponent(new Label(ms.get(i).getTexto()));
+
                                 }
-                               
-                                
                             }
                         });
                         layoutUsuario.addComponent(usu);
@@ -323,7 +318,7 @@ public class MyUI extends UI {
                     public void buttonClick(Button.ClickEvent event) {
                         //getSession().close();  peta porque antes de navegar se queda colgado
                         getSession().setAttribute("usuario", null);
-                        
+
                         navigator.navigateTo("salir");
                     }
                 });
@@ -358,14 +353,14 @@ public class MyUI extends UI {
 
             ConversacionDAO conversacionDAO = new ConversacionDAO();
             conversacionDAO.addConversacion(conversacion);
-            
+
             List<Conversacion> c = conversacionDAO.getAllConversaciones();
-            conversacion = c.get(c.size()-1);
+            conversacion = c.get(c.size() - 1);
             usuarioConversacionDAO.crearConversacion(usuarioLogado, usuarioChat, conversacion);
 
         } else {
             conversacion = listadoConversaciones.get(0).getConversacion();
         }
         return conversacion;
-    } 
+    }
 }
