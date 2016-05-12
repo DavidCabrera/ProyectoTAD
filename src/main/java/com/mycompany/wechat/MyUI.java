@@ -36,6 +36,7 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
@@ -62,6 +63,23 @@ public class MyUI extends UI {
         navigator.addView("", new LoginView());
         navigator.addView("salir", new SalirView());
         navigator.addView(MAINVIEW, new VistaPrincipal());
+        navigator.addView("administracion", new adminView());
+    }
+    
+    private static class adminView extends VerticalLayout implements View {
+
+        public adminView() {
+        }
+
+        
+
+        @Override
+        public void enter(ViewChangeListener.ViewChangeEvent event) {
+            getSession().close();
+            Link link = new Link("volver al login", new ExternalResource("/*"));
+            addComponent(link);
+
+        }
     }
 
     private static class SalirView extends VerticalLayout implements View {
@@ -159,6 +177,7 @@ public class MyUI extends UI {
         VerticalLayout nombreUsuario = new VerticalLayout();
         VerticalLayout texto = new VerticalLayout(new Label("MENSAJE"));
         Usuario usuarioLogueado;
+        Usuario usuChat;
 
         public VistaPrincipal() {
             setSizeFull();
@@ -190,6 +209,7 @@ public class MyUI extends UI {
                     if (null != Lusu && !Lusu.isEmpty()) {
                         for (Usuario usuarioItem : Lusu) {
                             final Usuario usuarioChat = usuarioItem;
+                            usuChat = usuarioChat;
                             Button usu = new Button(usuarioItem.getUsuario());
                             usu.setWidth("100%");
                             usu.addClickListener(new ClickListener() {
@@ -201,7 +221,7 @@ public class MyUI extends UI {
                                     final Conversacion conversacion = crearConversacion(usuarioLogueado, usuarioChat);
                                     List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(conversacion);
                                     texto.removeAllComponents();
-                                   for (int i = 0; i < ms.size(); i++) {
+                                    for (int i = 0; i < ms.size(); i++) {
                                         Mensaje m = ms.get(i);
                                         if(m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())){
                                             //si soy yo alinear a la derecha
@@ -269,14 +289,50 @@ public class MyUI extends UI {
 
             Button botonEnviar = new Button("Enviar");
             
+            
+            
             texto.setStyleName("mensaje");
             texto.setHeight("100%");
-            TextField escribir = new TextField();
+            final TextField escribir = new TextField();
             escribir.setInputPrompt("Escriba su mensaje...");
             escribir.setWidth("100%");
             escribir.setHeight("100%");
             escribir.setStyleName("escribir");
             botonEnviar.setWidth("100%");
+            
+            botonEnviar.addListener(new ClickListener() {
+
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    MensajeDAO mdao= new MensajeDAO();
+                    Mensaje me = new Mensaje();
+                    me.setConversacion(crearConversacion(usuarioLogueado, usuChat));
+                    me.setFecha(new Timestamp(new Date().getTime()));
+                    me.setTexto(escribir.getValue());
+                    me.setUsuario(usuarioLogueado);
+                    me.setArchivo(null);
+                    mdao.addMensaje(me);
+                    escribir.setValue("");
+                    List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(me.getConversacion());
+                                    texto.removeAllComponents();
+                                    for (int i = 0; i < ms.size(); i++) {
+                                        Mensaje m = ms.get(i);
+                                        if(m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())){
+                                            //si soy yo alinear a la derecha
+                                            Label l = new Label("<div align='right'>"+ms.get(i).getTexto()+"</div>", ContentMode.HTML);                                            
+                                             texto.addComponent(l);                                             
+                                        }else{
+                                            //si es el otro alinear izq
+                                            String aux= "<div align='left'>"+ms.get(i).getTexto()+"</div>";
+                                            Label l = new Label(aux, ContentMode.HTML);                                            
+                                             texto.addComponent(l);
+                                            
+                                        }                                        
+                                    }
+                    
+                    
+                }
+            });
             
             der.addComponent(texto);
             der.addComponent(escribir);
@@ -307,6 +363,7 @@ public class MyUI extends UI {
                 if (null != Lusu && !Lusu.isEmpty()) {
                     for (Usuario usuarioItem : Lusu) {
                         final Usuario usuarioChat = usuarioItem;
+                        
                         Button usu = new Button(usuarioItem.getUsuario());
                         usu.setWidth("100%");
                         usu.addClickListener(new ClickListener() {
@@ -315,6 +372,7 @@ public class MyUI extends UI {
                                 nombreUsuario.removeAllComponents();
                                 nombreUsuario.addComponent(new Label(usuarioChat.getUsuario()));
                                 // Cargar conversación
+                                usuChat = usuarioChat;
                                 final Conversacion conversacion = crearConversacion(usuarioLogueado, usuarioChat);
                                 List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(conversacion);
                                 texto.removeAllComponents();

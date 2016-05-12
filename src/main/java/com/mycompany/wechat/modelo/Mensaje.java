@@ -17,6 +17,14 @@ public class Mensaje  implements java.io.Serializable {
      private String texto;
      private Date fecha;
 
+    public Mensaje(Conversacion conversacion, Usuario usuario, String texto, Date fecha) {
+        this.conversacion = conversacion;
+        this.usuario = usuario;
+        this.texto = texto;
+        this.fecha = fecha;
+    }
+
+     
     public Mensaje() {
     }
 

@@ -9,7 +9,7 @@
             <generator class="identity" />
         </id>
         <many-to-one name="archivo" class="com.mycompany.wechat.modelo.Archivo" fetch="select">
-            <column name="idArchivo" not-null="true" />
+            <column name="idArchivo" not-null="false"/>
         </many-to-one>
         <many-to-one name="conversacion" class="com.mycompany.wechat.modelo.Conversacion" fetch="select">
             <column name="idConversacion" not-null="true" />
