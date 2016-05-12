@@ -391,7 +391,7 @@ public class MyUI extends UI {
             OnEnterKeyHandler onEnterHandler = new OnEnterKeyHandler() {
                 @Override
                 public void onEnterKeyPressed() {
-                String contenido = textBuscar.getValue();
+                    String contenido = textBuscar.getValue();
                     UsuarioDAO usuDAO = new UsuarioDAO();
                     // final Usuario usuario = (Usuario) getSession().getAttribute("usuario");
                     String logueado = usuarioLogueado.getUsuario();
@@ -434,8 +434,7 @@ public class MyUI extends UI {
                     } else {
                         layoutUsuario.addComponent(new Label("No hay usuarios en la aplicación."));
                     }
-                
-                
+
                 }
             };
             onEnterHandler.installOn(textBuscar);
@@ -532,29 +531,32 @@ public class MyUI extends UI {
             OnEnterKeyHandler onEnterHandler1 = new OnEnterKeyHandler() {
                 @Override
                 public void onEnterKeyPressed() {
-                    MensajeDAO mdao = new MensajeDAO();
-                    Mensaje me = new Mensaje();
-                    me.setConversacion(crearConversacion(usuarioLogueado, usuChat));
-                    me.setFecha(new Timestamp(new Date().getTime()));
-                    me.setTexto(escribir.getValue());
-                    me.setUsuario(usuarioLogueado);
-                    me.setArchivo(null);
-                    mdao.addMensaje(me);
-                    escribir.setValue("");
-                    List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(me.getConversacion());
-                    texto.removeAllComponents();
-                    for (int i = 0; i < ms.size(); i++) {
-                        Mensaje m = ms.get(i);
-                        if (m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
-                            //si soy yo alinear a la derecha
-                            Label l = new Label("<div align='right'>" + ms.get(i).getTexto() + "</div>", ContentMode.HTML);
-                            texto.addComponent(l);
-                        } else {
-                            //si es el otro alinear izq
-                            String aux = "<div align='left'>" + ms.get(i).getTexto() + "</div>";
-                            Label l = new Label(aux, ContentMode.HTML);
-                            texto.addComponent(l);
+                    if (!escribir.getValue().trim().isEmpty() && !"".equals(escribir.getValue().trim())) {
 
+                        MensajeDAO mdao = new MensajeDAO();
+                        Mensaje me = new Mensaje();
+                        me.setConversacion(crearConversacion(usuarioLogueado, usuChat));
+                        me.setFecha(new Timestamp(new Date().getTime()));
+                        me.setTexto(escribir.getValue());
+                        me.setUsuario(usuarioLogueado);
+                        me.setArchivo(null);
+                        mdao.addMensaje(me);
+                        escribir.setValue("");
+                        List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(me.getConversacion());
+                        texto.removeAllComponents();
+                        for (int i = 0; i < ms.size(); i++) {
+                            Mensaje m = ms.get(i);
+                            if (m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
+                                //si soy yo alinear a la derecha
+                                Label l = new Label("<div align='right'>" + ms.get(i).getTexto() + "</div>", ContentMode.HTML);
+                                texto.addComponent(l);
+                            } else {
+                                //si es el otro alinear izq
+                                String aux = "<div align='left'>" + ms.get(i).getTexto() + "</div>";
+                                Label l = new Label(aux, ContentMode.HTML);
+                                texto.addComponent(l);
+
+                            }
                         }
                     }
                 }
@@ -565,32 +567,34 @@ public class MyUI extends UI {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    MensajeDAO mdao = new MensajeDAO();
-                    Mensaje me = new Mensaje();
-                    me.setConversacion(crearConversacion(usuarioLogueado, usuChat));
-                    me.setFecha(new Timestamp(new Date().getTime()));
-                    me.setTexto(escribir.getValue());
-                    me.setUsuario(usuarioLogueado);
-                    me.setArchivo(null);
-                    mdao.addMensaje(me);
-                    escribir.setValue("");
-                    List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(me.getConversacion());
-                    texto.removeAllComponents();
-                    for (int i = 0; i < ms.size(); i++) {
-                        Mensaje m = ms.get(i);
-                        if (m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
-                            //si soy yo alinear a la derecha
-                            Label l = new Label("<div align='right'>" + ms.get(i).getTexto() + "</div>", ContentMode.HTML);
-                            texto.addComponent(l);
-                        } else {
-                            //si es el otro alinear izq
-                            String aux = "<div align='left'>" + ms.get(i).getTexto() + "</div>";
-                            Label l = new Label(aux, ContentMode.HTML);
-                            texto.addComponent(l);
+                    if (!escribir.getValue().trim().isEmpty() && !"".equals(escribir.getValue().trim())) {
+                        MensajeDAO mdao = new MensajeDAO();
+                        Mensaje me = new Mensaje();
+                        me.setConversacion(crearConversacion(usuarioLogueado, usuChat));
+                        me.setFecha(new Timestamp(new Date().getTime()));
+                        me.setTexto(escribir.getValue());
+                        me.setUsuario(usuarioLogueado);
+                        me.setArchivo(null);
+                        mdao.addMensaje(me);
+                        escribir.setValue("");
+                        List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(me.getConversacion());
+                        texto.removeAllComponents();
+                        for (int i = 0; i < ms.size(); i++) {
+                            Mensaje m = ms.get(i);
+                            if (m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
+                                //si soy yo alinear a la derecha
+                                Label l = new Label("<div align='right'>" + ms.get(i).getTexto() + "</div>", ContentMode.HTML);
+                                texto.addComponent(l);
+                            } else {
+                                //si es el otro alinear izq
+                                String aux = "<div align='left'>" + ms.get(i).getTexto() + "</div>";
+                                Label l = new Label(aux, ContentMode.HTML);
+                                texto.addComponent(l);
 
+                            }
                         }
-                    }
 
+                    }
                 }
             });
 
