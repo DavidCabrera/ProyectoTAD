@@ -147,6 +147,33 @@ public class MensajeDAO {
         }
         return listadoMensajes;
     }
+    
+    
+    /**
+     * Obtener los mensajes de un usuario concreto
+     *
+     * @param usuario Usuario seleccionado en la lista
+     * @return el numero de mensajes de ese usuario
+     */
+    public List<Long> getCountMensajesDeUsuario(Usuario usuario) {
+        Session session = null;
+        List<Long> listadoMensajes =null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            String hql = "select count(*) From Mensaje WHERE idUsuario='" + usuario.getIdUsuario() + "' group by idConversacion";
+            Query query = session.createQuery(hql);
+            listadoMensajes =  query.list();
+            tx.commit();
+        } catch (Exception e) {
+            log.error("Error obteniendo el listado de mensajes: ", e);
+        } finally {
+            if (null != session) {
+                session.close();
+            }
+        }
+        return listadoMensajes;
+    }
     /**
      * Obtener los mensajes de una conversacion concreta
      *
