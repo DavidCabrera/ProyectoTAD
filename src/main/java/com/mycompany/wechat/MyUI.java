@@ -41,6 +41,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
@@ -348,7 +349,7 @@ public class MyUI extends UI {
             });
             layout.addComponent(boton);
 
-            Link link = new Link("registrarse", new ExternalResource("/#!registro"));
+            Link link = new Link("Registrarse", new ExternalResource("/#!registro"));
             layout.addComponent(link);
 
             addComponent(layout);
@@ -369,15 +370,17 @@ public class MyUI extends UI {
         HorizontalLayout vertusuario = new HorizontalLayout();
         VerticalLayout layoutUsuario = new VerticalLayout();
         VerticalLayout nombreUsuario = new VerticalLayout();
-        VerticalLayout texto = new VerticalLayout(new Label("MENSAJE"));
+        VerticalLayout texto = new VerticalLayout();
+
         Usuario usuarioLogueado;
         Usuario usuChat;
 
         public VistaPrincipal() {
             setSizeFull();
+            HorizontalLayout todo = new HorizontalLayout();
+            texto.setSpacing(true);
 
             // ------------------ IZQUIERDA ----------------------
-            HorizontalLayout todo = new HorizontalLayout();
 
             todo.setStyleName("pagina_principal");
             setDefaultComponentAlignment(Alignment.TOP_CENTER);
@@ -417,11 +420,13 @@ public class MyUI extends UI {
                                         if (m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
                                             //si soy yo alinear a la derecha
                                             Label l = new Label("<div align='right'>" + ms.get(i).getTexto() + "</div>", ContentMode.HTML);
+                                            l.setStyleName("mensaje_globo_out");
                                             texto.addComponent(l);
                                         } else {
                                             //si es el otro alinear izq
                                             String aux = "<div align='left'>" + ms.get(i).getTexto() + "</div>";
                                             Label l = new Label(aux, ContentMode.HTML);
+                                            l.setStyleName("mensaje_globo_in");
                                             texto.addComponent(l);
 
                                         }
@@ -465,18 +470,25 @@ public class MyUI extends UI {
                                     final Conversacion conversacion = crearConversacion(usuarioLogueado, usuarioChat);
                                     List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(conversacion);
                                     texto.removeAllComponents();
+                                    SimpleDateFormat formateador = new SimpleDateFormat("HH:mm");
                                     for (int i = 0; i < ms.size(); i++) {
                                         Mensaje m = ms.get(i);
                                         if (m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
                                             //si soy yo alinear a la derecha
-                                            Label l = new Label("<div align='right'>" + ms.get(i).getTexto() + "</div>", ContentMode.HTML);
+                                            String aux = "<div><div>" + ms.get(i).getTexto() + "</div><div class='meta'>" + formateador.format(ms.get(i).getFecha()) + "</div></div>";
+                                            Label l = new Label(aux, ContentMode.HTML);
+                                            l.setWidthUndefined();
+                                            l.setHeight("40px");
+                                            l.setStyleName("mensaje_globo_out");
                                             texto.addComponent(l);
                                         } else {
                                             //si es el otro alinear izq
-                                            String aux = "<div align='left'>" + ms.get(i).getTexto() + "</div>";
+                                            String aux = "<div><div>" + ms.get(i).getTexto() + "</div><div class='meta'>" + formateador.format(ms.get(i).getFecha()) + "</div></div>";
                                             Label l = new Label(aux, ContentMode.HTML);
+                                            l.setWidthUndefined();
+                                            l.setHeight("40px");
+                                            l.setStyleName("mensaje_globo_in");
                                             texto.addComponent(l);
-
                                         }
                                     }
                                 }
@@ -510,7 +522,7 @@ public class MyUI extends UI {
             VerticalLayout der = new VerticalLayout();
             der.setStyleName("parte_derecha");
             der.setWidth("500px");
-            der.setHeight("500px");
+            der.setHeight("600px");
 
             nombreUsuario.setStyleName("nombreUsuario");
             nombreUsuario.setHeight("100%");
@@ -544,18 +556,25 @@ public class MyUI extends UI {
                         escribir.setValue("");
                         List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(me.getConversacion());
                         texto.removeAllComponents();
+                        SimpleDateFormat formateador = new SimpleDateFormat("HH:mm");
                         for (int i = 0; i < ms.size(); i++) {
                             Mensaje m = ms.get(i);
                             if (m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
                                 //si soy yo alinear a la derecha
-                                Label l = new Label("<div align='right'>" + ms.get(i).getTexto() + "</div>", ContentMode.HTML);
+                                String aux = "<div><div>" + ms.get(i).getTexto() + "</div><div class='meta'>" + formateador.format(ms.get(i).getFecha()) + "</div></div>";
+                                Label l = new Label(aux, ContentMode.HTML);
+                                l.setWidthUndefined();
+                                l.setHeight("40px");
+                                l.setStyleName("mensaje_globo_out");
                                 texto.addComponent(l);
                             } else {
                                 //si es el otro alinear izq
-                                String aux = "<div align='left'>" + ms.get(i).getTexto() + "</div>";
+                                String aux = "<div><div>" + ms.get(i).getTexto() + "</div><div class='meta'>" + formateador.format(ms.get(i).getFecha()) + "</div></div>";
                                 Label l = new Label(aux, ContentMode.HTML);
+                                l.setWidthUndefined();
+                                l.setHeight("40px");
+                                l.setStyleName("mensaje_globo_in");
                                 texto.addComponent(l);
-
                             }
                         }
                     }
@@ -579,18 +598,25 @@ public class MyUI extends UI {
                         escribir.setValue("");
                         List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(me.getConversacion());
                         texto.removeAllComponents();
+                        SimpleDateFormat formateador = new SimpleDateFormat("HH:mm");
                         for (int i = 0; i < ms.size(); i++) {
                             Mensaje m = ms.get(i);
                             if (m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
                                 //si soy yo alinear a la derecha
-                                Label l = new Label("<div align='right'>" + ms.get(i).getTexto() + "</div>", ContentMode.HTML);
+                                String aux = "<div><div>" + ms.get(i).getTexto() + "</div><div class='meta'>" + formateador.format(ms.get(i).getFecha()) + "</div></div>";
+                                Label l = new Label(aux, ContentMode.HTML);
+                                l.setWidthUndefined();
+                                l.setHeight("40px");
+                                l.setStyleName("mensaje_globo_out");
                                 texto.addComponent(l);
                             } else {
                                 //si es el otro alinear izq
-                                String aux = "<div align='left'>" + ms.get(i).getTexto() + "</div>";
+                                String aux = "<div><div>" + ms.get(i).getTexto() + "</div><div class='meta'>" + formateador.format(ms.get(i).getFecha()) + "</div></div>";
                                 Label l = new Label(aux, ContentMode.HTML);
+                                l.setWidthUndefined();
+                                l.setHeight("40px");
+                                l.setStyleName("mensaje_globo_in");
                                 texto.addComponent(l);
-
                             }
                         }
 
@@ -603,8 +629,8 @@ public class MyUI extends UI {
             der.addComponent(botonEnviar);
 
             der.setExpandRatio(nombreUsuario, 0.1f);
-            der.setExpandRatio(texto, 0.75f);
-            der.setExpandRatio(escribir, 0.15f);
+            der.setExpandRatio(texto, 0.8f);
+            der.setExpandRatio(escribir, 0.10f);
 
             todo.addComponent(izq);
             todo.addComponent(der);
@@ -634,23 +660,32 @@ public class MyUI extends UI {
                             @Override
                             public void buttonClick(Button.ClickEvent event) {
                                 nombreUsuario.removeAllComponents();
-                                nombreUsuario.addComponent(new Label(usuarioChat.getUsuario()));
+                                Label labelNombreUsuario = new Label(usuarioChat.getUsuario());
+                                labelNombreUsuario.setStyleName("texto_usuario");
+                                nombreUsuario.addComponent(labelNombreUsuario);
                                 // Cargar conversación
                                 usuChat = usuarioChat;
                                 final Conversacion conversacion = crearConversacion(usuarioLogueado, usuarioChat);
                                 List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(conversacion);
                                 texto.removeAllComponents();
+                                SimpleDateFormat formateador = new SimpleDateFormat("HH:mm");
                                 for (int i = 0; i < ms.size(); i++) {
                                     Mensaje m = ms.get(i);
                                     if (m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
                                         //si soy yo alinear a la derecha
-                                        Label l = new Label("<div align='right'>" + ms.get(i).getTexto() + "</div>", ContentMode.HTML);
+                                        String aux = "<div><div>" + ms.get(i).getTexto() + "</div><div class='meta'>" + formateador.format(ms.get(i).getFecha()) + "</div></div>";
+                                        Label l = new Label(aux, ContentMode.HTML);
+                                        l.setWidthUndefined();
+                                        l.setHeight("40px");
+                                        l.setStyleName("mensaje_globo_out");
                                         texto.addComponent(l);
-
                                     } else {
                                         //si es el otro alinear izq
-                                        String aux = "<div align='left'>" + ms.get(i).getTexto() + "</div>";
+                                        String aux = "<div><div>" + ms.get(i).getTexto() + "</div><div class='meta'>" + formateador.format(ms.get(i).getFecha()) + "</div></div>";
                                         Label l = new Label(aux, ContentMode.HTML);
+                                        l.setWidthUndefined();
+                                        l.setHeight("40px");
+                                        l.setStyleName("mensaje_globo_in");
                                         texto.addComponent(l);
                                     }
                                 }
@@ -664,6 +699,7 @@ public class MyUI extends UI {
                 }
 
                 Label usuarioLogado = new Label(usuarioLogueado.getUsuario());
+                usuarioLogado.setStyleName("texto_usuario");
                 vertusuario.addComponent(usuarioLogado);
 
                 Button botonSalir = new Button("Salir");
@@ -677,7 +713,7 @@ public class MyUI extends UI {
                     }
                 });
 
-                Button configuracion = new Button("configuracion");
+                Button configuracion = new Button("Configuración");
                 configuracion.addClickListener(new ClickListener() {
 
                     @Override
@@ -689,7 +725,8 @@ public class MyUI extends UI {
                 vertusuario.addComponent(configuracion);
                 vertusuario.addComponent(botonSalir);
 
-                vertusuario.setExpandRatio(usuarioLogado, 0.78f);
+                vertusuario.setExpandRatio(usuarioLogado, 0.40f);
+                vertusuario.setExpandRatio(configuracion, 0.40f);
                 vertusuario.setExpandRatio(botonSalir, 0.22f);
             }
         }

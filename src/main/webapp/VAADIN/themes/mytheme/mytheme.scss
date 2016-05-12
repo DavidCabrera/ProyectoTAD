@@ -70,13 +70,51 @@
     .mensaje
     {
         background-image: url("/VAADIN/themes/mytheme/wechat/img/fondoMensaje.jpg");
-        
+        overflow: scroll;
     }
-
+    
+    .mensaje_globo_in
+    {
+        border-radius: 10px 10px 10px 10px;
+        -moz-border-radius: 10px 10px 10px 10px;
+        -webkit-border-radius: 10px 10px 10px 10px;
+        border: 0px none #faf7fa;
+        background-color: #fff;
+        padding: 5px;
+        margin: 0px 5px;
+        float: left;
+    }
+    
+    .mensaje_globo_out
+    {
+        border-radius: 10px 10px 10px 10px;
+        -moz-border-radius: 10px 10px 10px 10px;
+        -webkit-border-radius: 10px 10px 10px 10px;
+        border: 0px none #faf7fa;
+        background-color: #dcf8c6;
+        padding: 5px;
+        float: right;
+        margin: 0px 5px;
+    }
+    
     .nombreUsuario
     {
-        
-        background-color: grey;
+        background-color: #eee;
+        font-weight: 400;
+    }
+    
+    .meta
+    {
+        margin-left: 60px;
+        font-size: 9px;
+        height: 10px;
+        line-height: 10px;
+    }
+    
+    .texto_usuario
+    {
+        margin: 10px 5px 0px 5px;
+        font-weight: bold;
     }
     
 }
