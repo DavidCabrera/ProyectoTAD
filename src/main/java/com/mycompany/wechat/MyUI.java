@@ -40,6 +40,7 @@ import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -127,12 +128,45 @@ public class MyUI extends UI {
 
             Button eliminarUsu = new Button("Darse de baja");
             eliminarUsu.addClickListener(new ClickListener() {
+                boolean bsi = false;
 
                 @Override
+
                 public void buttonClick(Button.ClickEvent event) {
-                    UsuarioDAO uDAO = new UsuarioDAO();
-                    uDAO.deleteUsuario(u);
-                    navigator.navigateTo("salir");
+                    final Window subWindow = new Window("CUIDADO!");
+                    VerticalLayout subContent = new VerticalLayout();
+                    subContent.setMargin(true);
+                    subWindow.setContent(subContent);
+
+                    // Put some components in it
+                    subContent.addComponent(new Label("¿Está seguro de querer darse de baja?"));
+                    Button si = new Button("SI");
+                    si.addClickListener(new ClickListener() {
+                        @Override
+                        public void buttonClick(Button.ClickEvent event) {
+                            UsuarioDAO uDAO = new UsuarioDAO();
+                            uDAO.deleteUsuario(u);
+                            subWindow.close();
+                            navigator.navigateTo("salir");
+                        }
+                    });
+                    Button no = new Button("NO");
+                    no.addClickListener(new ClickListener() {
+                        @Override
+                        public void buttonClick(Button.ClickEvent event) {
+                            subWindow.close();
+                        }
+                    });
+
+                    subContent.addComponent(no);
+                    subContent.addComponent(si);
+                    subWindow.center();
+
+                    // Open it in the UI
+                    addWindow(subWindow);
+
+                    
+                    
                 }
             });
             layout.addComponent(eliminarUsu);
@@ -148,18 +182,10 @@ public class MyUI extends UI {
 
                     Chart tarta = new Chart(ChartType.PIE);
                     Configuration conf = tarta.getConfiguration();
-                    conf.setTitle("estadisticas:");
+                    conf.setTitle("estadisticas,número de numero de mensajes por conversación");
                     DataSeries series = new DataSeries();
-                    series.setName("numero mensajes");
+                    series.setName("número mensajes");
 
-//             List<Usuario> listu = new UsuarioDAO().getListaUsuariosParaChatear(u);
-//             if (!listu.isEmpty()) {
-//             for (Usuario u2 : listu) {
-//             int b = mdao.getCountMensajesDeUsuario(u2);
-//             DataSeriesItem a = new DataSeriesItem(u2.getUsuario(), b);
-//             series.add(a);
-//             }
-//             }
                     for (Long m : listm) {
                         DataSeriesItem a = new DataSeriesItem("", m);
                         series.add(a);
@@ -170,32 +196,7 @@ public class MyUI extends UI {
             });
 
             layout.addComponent(graficas);
-//            if (u != null) {
-//
-//                MensajeDAO mdao = new MensajeDAO();
-//                List<Integer> listm = mdao.getCountMensajesDeUsuario(u);
-//
-//                Chart tarta = new Chart(ChartType.PIE);
-//                Configuration conf = tarta.getConfiguration();
-//                conf.setTitle("estadisticas:");
-//                DataSeries series = new DataSeries();
-//                series.setName("numero mensajes");
-//
-////             List<Usuario> listu = new UsuarioDAO().getListaUsuariosParaChatear(u);
-////             if (!listu.isEmpty()) {
-////             for (Usuario u2 : listu) {
-////             int b = mdao.getCountMensajesDeUsuario(u2);
-////             DataSeriesItem a = new DataSeriesItem(u2.getUsuario(), b);
-////             series.add(a);
-////             }
-////             }
-//                for (Integer m : listm) {
-//                    DataSeriesItem a = new DataSeriesItem("hola", 2);
-//                    series.add(a);
-//                }
-//                conf.addSeries(series);
-//                layout.addComponent(tarta);
-//            }
+
             addComponent(layout);
 
         }
@@ -381,7 +382,6 @@ public class MyUI extends UI {
             texto.setSpacing(true);
 
             // ------------------ IZQUIERDA ----------------------
-
             todo.setStyleName("pagina_principal");
             setDefaultComponentAlignment(Alignment.TOP_CENTER);
             VerticalLayout izq = new VerticalLayout();
