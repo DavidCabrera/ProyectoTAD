@@ -159,20 +159,15 @@ public class MyUI extends UI {
 //             series.add(a);
 //             }
 //             }
-                    
-                        
-                    
-                    
-                    for (Long m : listm) {                        
-                        DataSeriesItem a = new DataSeriesItem("",m);
+                    for (Long m : listm) {
+                        DataSeriesItem a = new DataSeriesItem("", m);
                         series.add(a);
                     }
                     conf.addSeries(series);
                     layout.addComponent(tarta);
                 }
             });
-            
-            
+
             layout.addComponent(graficas);
 //            if (u != null) {
 //
@@ -393,6 +388,57 @@ public class MyUI extends UI {
 
             final TextField textBuscar = new TextField("Buscar");
             textBuscar.setStyleName("busqueda_usuario");
+            OnEnterKeyHandler onEnterHandler = new OnEnterKeyHandler() {
+                @Override
+                public void onEnterKeyPressed() {
+                String contenido = textBuscar.getValue();
+                    UsuarioDAO usuDAO = new UsuarioDAO();
+                    // final Usuario usuario = (Usuario) getSession().getAttribute("usuario");
+                    String logueado = usuarioLogueado.getUsuario();
+                    List<Usuario> Lusu = usuDAO.getListaFiltroUsuarios(contenido, logueado);
+                    layoutUsuario.removeAllComponents();
+                    if (null != Lusu && !Lusu.isEmpty()) {
+                        for (Usuario usuarioItem : Lusu) {
+                            final Usuario usuarioChat = usuarioItem;
+                            usuChat = usuarioChat;
+                            Button usu = new Button(usuarioItem.getUsuario());
+                            usu.setWidth("100%");
+                            usu.addClickListener(new ClickListener() {
+                                @Override
+                                public void buttonClick(Button.ClickEvent event) {
+                                    nombreUsuario.removeAllComponents();
+                                    nombreUsuario.addComponent(new Label(usuarioChat.getUsuario()));
+                                    // Cargar conversación
+                                    final Conversacion conversacion = crearConversacion(usuarioLogueado, usuarioChat);
+                                    List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(conversacion);
+                                    texto.removeAllComponents();
+                                    for (int i = 0; i < ms.size(); i++) {
+                                        Mensaje m = ms.get(i);
+                                        if (m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
+                                            //si soy yo alinear a la derecha
+                                            Label l = new Label("<div align='right'>" + ms.get(i).getTexto() + "</div>", ContentMode.HTML);
+                                            texto.addComponent(l);
+                                        } else {
+                                            //si es el otro alinear izq
+                                            String aux = "<div align='left'>" + ms.get(i).getTexto() + "</div>";
+                                            Label l = new Label(aux, ContentMode.HTML);
+                                            texto.addComponent(l);
+
+                                        }
+                                    }
+                                }
+                            });
+                            layoutUsuario.addComponent(usu);
+
+                        }
+                    } else {
+                        layoutUsuario.addComponent(new Label("No hay usuarios en la aplicación."));
+                    }
+                
+                
+                }
+            };
+            onEnterHandler.installOn(textBuscar);
 
             Button botonBuscar = new Button("Buscar");
 
@@ -481,6 +527,39 @@ public class MyUI extends UI {
             escribir.setHeight("100%");
             escribir.setStyleName("escribir");
             botonEnviar.setWidth("100%");
+
+            escribir.setImmediate(true);
+            OnEnterKeyHandler onEnterHandler1 = new OnEnterKeyHandler() {
+                @Override
+                public void onEnterKeyPressed() {
+                    MensajeDAO mdao = new MensajeDAO();
+                    Mensaje me = new Mensaje();
+                    me.setConversacion(crearConversacion(usuarioLogueado, usuChat));
+                    me.setFecha(new Timestamp(new Date().getTime()));
+                    me.setTexto(escribir.getValue());
+                    me.setUsuario(usuarioLogueado);
+                    me.setArchivo(null);
+                    mdao.addMensaje(me);
+                    escribir.setValue("");
+                    List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(me.getConversacion());
+                    texto.removeAllComponents();
+                    for (int i = 0; i < ms.size(); i++) {
+                        Mensaje m = ms.get(i);
+                        if (m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
+                            //si soy yo alinear a la derecha
+                            Label l = new Label("<div align='right'>" + ms.get(i).getTexto() + "</div>", ContentMode.HTML);
+                            texto.addComponent(l);
+                        } else {
+                            //si es el otro alinear izq
+                            String aux = "<div align='left'>" + ms.get(i).getTexto() + "</div>";
+                            Label l = new Label(aux, ContentMode.HTML);
+                            texto.addComponent(l);
+
+                        }
+                    }
+                }
+            };
+            onEnterHandler1.installOn(escribir);
 
             botonEnviar.addClickListener(new ClickListener() {
 
@@ -587,7 +666,7 @@ public class MyUI extends UI {
                 botonSalir.addClickListener(new ClickListener() {
                     @Override
                     public void buttonClick(Button.ClickEvent event) {
-                        //getSession().close();  peta porque antes de navegar se queda colgado
+
                         getSession().setAttribute("usuario", null);
 
                         navigator.navigateTo("salir");
