@@ -226,7 +226,7 @@ public class MyUI extends UI {
 
                 }
             });
-            izq.addComponent(botonBuscar);
+            
 
 //            textBuscar.
 //            textBuscar.setImmediate(true);
@@ -238,6 +238,10 @@ public class MyUI extends UI {
 //                }
 //            };
 //            onEnterHandler.installOn(textBuscar);
+            
+            
+            
+            
             vertusuario.setStyleName("nombreUsuario");
             vertusuario.setHeight("100%");
             vertusuario.setWidth("100%");
@@ -246,6 +250,8 @@ public class MyUI extends UI {
 
             izq.addComponent(vertusuario);
             izq.addComponent(textBuscar);
+            botonBuscar.setWidth("100%");
+            izq.addComponent(botonBuscar);
             izq.addComponent(layoutUsuario);
             izq.setExpandRatio(vertusuario, 0.1f);
             izq.setExpandRatio(textBuscar, 0.15f);
@@ -261,6 +267,8 @@ public class MyUI extends UI {
             nombreUsuario.setHeight("100%");
             der.addComponent(nombreUsuario);
 
+            Button botonEnviar = new Button("Enviar");
+            
             texto.setStyleName("mensaje");
             texto.setHeight("100%");
             TextField escribir = new TextField();
@@ -268,8 +276,11 @@ public class MyUI extends UI {
             escribir.setWidth("100%");
             escribir.setHeight("100%");
             escribir.setStyleName("escribir");
+            botonEnviar.setWidth("100%");
+            
             der.addComponent(texto);
             der.addComponent(escribir);
+            der.addComponent(botonEnviar);
 
             der.setExpandRatio(nombreUsuario, 0.1f);
             der.setExpandRatio(texto, 0.75f);
