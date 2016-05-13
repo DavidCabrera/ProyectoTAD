@@ -100,7 +100,10 @@ public class MyUI extends UI {
                         u.setAdmin("N");
                         UsuarioDAO uDAO = new UsuarioDAO();
                         uDAO.updateUsuario(u);
-                        navigator.navigateTo("salir");
+                        getSession().setAttribute("usuario", null);
+                        final String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
+                        getUI().getPage().setLocation(context + "/wechat");
+                        getSession().close();
                     }
                 }
             });
@@ -120,7 +123,10 @@ public class MyUI extends UI {
                         u.setAdmin("N");
                         UsuarioDAO uDAO = new UsuarioDAO();
                         uDAO.updateUsuario(u);
-                        navigator.navigateTo("salir");
+                        getSession().setAttribute("usuario", null);
+                        final String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
+                        getUI().getPage().setLocation(context + "/wechat");
+                        getSession().close();
                     }
                 }
             });
@@ -147,7 +153,10 @@ public class MyUI extends UI {
                             UsuarioDAO uDAO = new UsuarioDAO();
                             uDAO.deleteUsuario(u);
                             subWindow.close();
-                            navigator.navigateTo("salir");
+                            getSession().setAttribute("usuario", null);
+                            final String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
+                            getUI().getPage().setLocation(context + "/wechat");
+                            getSession().close();
                         }
                     });
                     Button no = new Button("NO");
@@ -165,8 +174,6 @@ public class MyUI extends UI {
                     // Open it in the UI
                     addWindow(subWindow);
 
-                    
-                    
                 }
             });
             layout.addComponent(eliminarUsu);
@@ -371,7 +378,7 @@ public class MyUI extends UI {
             fondoTexto.addComponent(texto);
             texto.setSpacing(true);
             texto.setMargin(new MarginInfo(true, false, true, false));
-            
+
             layoutUsuario.setWidth("90%");
             // ------------------ IZQUIERDA ----------------------
             todo.setStyleName("pagina_principal");
@@ -381,9 +388,9 @@ public class MyUI extends UI {
             izq.setWidth("350px");
             izq.setHeight("100%");
             izq.setSpacing(true);
-            
+
             VerticalLayout layoutBuscar = new VerticalLayout();
-            
+
             final TextField textBuscar = new TextField("Buscar");
             textBuscar.setWidth("90%");
             textBuscar.setStyleName("busqueda_usuario");
@@ -413,20 +420,25 @@ public class MyUI extends UI {
                                     final Conversacion conversacion = crearConversacion(usuarioLogueado, usuarioChat);
                                     List<Mensaje> ms = new MensajeDAO().getMensajesDeConversacion(conversacion);
                                     texto.removeAllComponents();
+                                    SimpleDateFormat formateador = new SimpleDateFormat("HH:mm");
                                     for (int i = 0; i < ms.size(); i++) {
                                         Mensaje m = ms.get(i);
                                         if (m.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
                                             //si soy yo alinear a la derecha
-                                            Label l = new Label("<div align='right'>" + ms.get(i).getTexto() + "</div>", ContentMode.HTML);
+                                            String aux = "<div><div>" + ms.get(i).getTexto() + "</div><div class='meta'>" + formateador.format(ms.get(i).getFecha()) + "</div></div>";
+                                            Label l = new Label(aux, ContentMode.HTML);
+                                            l.setWidthUndefined();
+                                            l.setHeight("40px");
                                             l.setStyleName("mensaje_globo_out");
                                             texto.addComponent(l);
                                         } else {
                                             //si es el otro alinear izq
-                                            String aux = "<div align='left'>" + ms.get(i).getTexto() + "</div>";
+                                            String aux = "<div><div>" + ms.get(i).getTexto() + "</div><div class='meta'>" + formateador.format(ms.get(i).getFecha()) + "</div></div>";
                                             Label l = new Label(aux, ContentMode.HTML);
+                                            l.setWidthUndefined();
+                                            l.setHeight("40px");
                                             l.setStyleName("mensaje_globo_in");
                                             texto.addComponent(l);
-
                                         }
                                     }
                                 }
@@ -538,14 +550,14 @@ public class MyUI extends UI {
             escribir.setHeight("100%");
             escribir.setStyleName("escribir");
             botonEnviar.setSizeFull();
-            
+
             layoutEscribir.setSizeFull();
             layoutEscribir.addComponent(escribir);
             layoutEscribir.addComponent(botonEnviar);
             layoutEscribir.setExpandRatio(escribir, 0.85f);
             layoutEscribir.setExpandRatio(botonEnviar, 0.15f);
             layoutEscribir.setComponentAlignment(botonEnviar, Alignment.MIDDLE_CENTER);
-            
+
             escribir.setImmediate(true);
             OnEnterKeyHandler onEnterHandler1 = new OnEnterKeyHandler() {
                 @Override
@@ -717,7 +729,7 @@ public class MyUI extends UI {
 
                         getSession().setAttribute("usuario", null);
                         final String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
-                        getUI().getPage().setLocation(context +"/wechat");
+                        getUI().getPage().setLocation(context + "/wechat");
                         getSession().close();
                     }
                 });
