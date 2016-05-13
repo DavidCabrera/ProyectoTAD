@@ -291,6 +291,7 @@ public class MyUI extends UI {
             layout.setSpacing(true);
 
             Image img = new Image(null, new ThemeResource("wechat/img/logo.png"));
+            img.setStyleName("redondo");
             layout.addComponent(img);
 
             textUsuario = new TextField("Usuario");
