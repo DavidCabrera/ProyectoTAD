@@ -27,6 +27,7 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.Position;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -67,7 +68,6 @@ public class MyUI extends UI {
         getPage().setTitle("WECHAT");
         navigator = new Navigator(this, this);
         navigator.addView("", new LoginView());
-        navigator.addView("salir", new SalirView());
         navigator.addView(MAINVIEW, new VistaPrincipal());
         navigator.addView("registro", new RegistroView());
         navigator.addView("configuracion", new ConfView());
@@ -275,21 +275,6 @@ public class MyUI extends UI {
         }
     }
 
-    private static class SalirView extends VerticalLayout implements View {
-
-        public SalirView() {
-
-        }
-
-        @Override
-        public void enter(ViewChangeListener.ViewChangeEvent event) {
-            getSession().close();
-            Link link = new Link("volver al login", new ExternalResource("/*"));
-            addComponent(link);
-
-        }
-    }
-
     public class LoginView extends VerticalLayout implements View {
 
         final TextField textUsuario;
@@ -371,6 +356,7 @@ public class MyUI extends UI {
         HorizontalLayout vertusuario = new HorizontalLayout();
         VerticalLayout layoutUsuario = new VerticalLayout();
         VerticalLayout nombreUsuario = new VerticalLayout();
+        VerticalLayout fondoTexto = new VerticalLayout();
         VerticalLayout texto = new VerticalLayout();
 
         Usuario usuarioLogueado;
@@ -379,8 +365,13 @@ public class MyUI extends UI {
         public VistaPrincipal() {
             setSizeFull();
             HorizontalLayout todo = new HorizontalLayout();
+            fondoTexto.setStyleName("mensaje");
+            fondoTexto.setSizeFull();
+            fondoTexto.addComponent(texto);
             texto.setSpacing(true);
-
+            texto.setMargin(new MarginInfo(true, false, true, false));
+            
+            layoutUsuario.setWidth("90%");
             // ------------------ IZQUIERDA ----------------------
             todo.setStyleName("pagina_principal");
             setDefaultComponentAlignment(Alignment.TOP_CENTER);
@@ -388,9 +379,15 @@ public class MyUI extends UI {
             izq.setStyleName("parte_izquierda");
             izq.setWidth("350px");
             izq.setHeight("100%");
-
+            izq.setSpacing(true);
+            
+            VerticalLayout layoutBuscar = new VerticalLayout();
+            
             final TextField textBuscar = new TextField("Buscar");
+            textBuscar.setWidth("90%");
             textBuscar.setStyleName("busqueda_usuario");
+            layoutBuscar.addComponent(textBuscar);
+            layoutBuscar.setComponentAlignment(textBuscar, Alignment.MIDDLE_CENTER);
             OnEnterKeyHandler onEnterHandler = new OnEnterKeyHandler() {
                 @Override
                 public void onEnterKeyPressed() {
@@ -445,7 +442,9 @@ public class MyUI extends UI {
             onEnterHandler.installOn(textBuscar);
 
             Button botonBuscar = new Button("Buscar");
-
+            botonBuscar.setWidth("90%");
+            layoutBuscar.addComponent(botonBuscar);
+            layoutBuscar.setComponentAlignment(botonBuscar, Alignment.MIDDLE_CENTER);
             botonBuscar.addClickListener(new ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
@@ -510,12 +509,14 @@ public class MyUI extends UI {
             layoutUsuario.setCaption("Listado de Usuarios");
 
             izq.addComponent(vertusuario);
-            izq.addComponent(textBuscar);
-            botonBuscar.setWidth("100%");
-            izq.addComponent(botonBuscar);
+            izq.addComponent(layoutBuscar);
+//            izq.addComponent(botonBuscar);
             izq.addComponent(layoutUsuario);
+            izq.setComponentAlignment(layoutUsuario, Alignment.TOP_CENTER);
+            izq.setComponentAlignment(layoutBuscar, Alignment.TOP_CENTER);
+//            izq.setComponentAlignment(botonBuscar, Alignment.TOP_CENTER);
             izq.setExpandRatio(vertusuario, 0.1f);
-            izq.setExpandRatio(textBuscar, 0.15f);
+            izq.setExpandRatio(layoutBuscar, 0.15f);
             izq.setExpandRatio(layoutUsuario, 0.75f);
 
             //---------------     DERECHA  ------------------------    
@@ -528,22 +529,27 @@ public class MyUI extends UI {
             nombreUsuario.setHeight("100%");
             der.addComponent(nombreUsuario);
 
+            HorizontalLayout layoutEscribir = new HorizontalLayout();
             Button botonEnviar = new Button("Enviar");
-
-            texto.setStyleName("mensaje");
-            texto.setHeight("100%");
             final TextField escribir = new TextField();
             escribir.setInputPrompt("Escriba su mensaje...");
             escribir.setWidth("100%");
             escribir.setHeight("100%");
             escribir.setStyleName("escribir");
-            botonEnviar.setWidth("100%");
-
+            botonEnviar.setSizeFull();
+            
+            layoutEscribir.setSizeFull();
+            layoutEscribir.addComponent(escribir);
+            layoutEscribir.addComponent(botonEnviar);
+            layoutEscribir.setExpandRatio(escribir, 0.85f);
+            layoutEscribir.setExpandRatio(botonEnviar, 0.15f);
+            layoutEscribir.setComponentAlignment(botonEnviar, Alignment.MIDDLE_CENTER);
+            
             escribir.setImmediate(true);
             OnEnterKeyHandler onEnterHandler1 = new OnEnterKeyHandler() {
                 @Override
                 public void onEnterKeyPressed() {
-                    if (!escribir.getValue().trim().isEmpty() && !"".equals(escribir.getValue().trim())) {
+                    if (!escribir.getValue().trim().isEmpty() && !"".equals(escribir.getValue().trim()) && null != usuChat) {
 
                         MensajeDAO mdao = new MensajeDAO();
                         Mensaje me = new Mensaje();
@@ -586,7 +592,7 @@ public class MyUI extends UI {
 
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    if (!escribir.getValue().trim().isEmpty() && !"".equals(escribir.getValue().trim())) {
+                    if (!escribir.getValue().trim().isEmpty() && !"".equals(escribir.getValue().trim()) && null != usuChat) {
                         MensajeDAO mdao = new MensajeDAO();
                         Mensaje me = new Mensaje();
                         me.setConversacion(crearConversacion(usuarioLogueado, usuChat));
@@ -624,13 +630,13 @@ public class MyUI extends UI {
                 }
             });
 
-            der.addComponent(texto);
-            der.addComponent(escribir);
-            der.addComponent(botonEnviar);
+            der.addComponent(fondoTexto);
+            der.addComponent(layoutEscribir);
+//            der.addComponent(botonEnviar);
 
             der.setExpandRatio(nombreUsuario, 0.1f);
-            der.setExpandRatio(texto, 0.8f);
-            der.setExpandRatio(escribir, 0.10f);
+            der.setExpandRatio(fondoTexto, 0.8f);
+            der.setExpandRatio(layoutEscribir, 0.10f);
 
             todo.addComponent(izq);
             todo.addComponent(der);
@@ -703,17 +709,20 @@ public class MyUI extends UI {
                 vertusuario.addComponent(usuarioLogado);
 
                 Button botonSalir = new Button("Salir");
+                botonSalir.setStyleName("texto_usuario");
                 botonSalir.addClickListener(new ClickListener() {
                     @Override
                     public void buttonClick(Button.ClickEvent event) {
 
                         getSession().setAttribute("usuario", null);
-
-                        navigator.navigateTo("salir");
+                        final String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
+                        getUI().getPage().setLocation(context +"/wechat");
+                        getSession().close();
                     }
                 });
 
                 Button configuracion = new Button("Configuración");
+                configuracion.setStyleName("texto_usuario");
                 configuracion.addClickListener(new ClickListener() {
 
                     @Override
@@ -724,8 +733,8 @@ public class MyUI extends UI {
 
                 vertusuario.addComponent(configuracion);
                 vertusuario.addComponent(botonSalir);
-
-                vertusuario.setExpandRatio(usuarioLogado, 0.40f);
+                vertusuario.setSpacing(true);
+                vertusuario.setExpandRatio(usuarioLogado, 0.34f);
                 vertusuario.setExpandRatio(configuracion, 0.40f);
                 vertusuario.setExpandRatio(botonSalir, 0.22f);
             }
